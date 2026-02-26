@@ -1,0 +1,33 @@
+.sidebar {
+    background: var(--color-light);
+    border: 1px var(--color-primary-100) solid;
+}
+
+/* Navigation buttons */
+.nav-btn {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 3px 15px;
+    gap: 15px;
+    border-radius: var(--border-radius);
+    color: var(--color-black);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 400;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-btn img {
+    width: 25px;
+    height: 25px;
+}
+
+.nav-btn:hover {
+    background-color: var(--color-primary-100);
+}
+
+.nav-btn-selected {
+    background-color: var(--color-primary-200);
+    color: var(--color-white);
+}

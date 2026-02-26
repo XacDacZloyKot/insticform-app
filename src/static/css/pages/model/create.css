@@ -1,0 +1,34 @@
+.parameter-row {
+    transition: all 0.3s ease;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Замените статические цвета на переменные */
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--color-primary-500), 0.05); /* Используйте RGB значения */
+}
+
+.table-light {
+    background-color: var(--color-light-200) !important;
+}
+
+.bg-light {
+    background-color: var(--color-light-200) !important;
+}
+
+/* Стили для чекбоксов */
+.form-check-input:checked {
+    background-color: var(--color-secondary-500);
+    border-color: var(--color-secondary-500);
+}
+
+/* Стили для инпутов */
+.form-control:focus {
+    border-color: var(--color-secondary-300);
+    box-shadow: 0 0 0 0.25rem rgba(var(--color-secondary-500), 0.25);
+}

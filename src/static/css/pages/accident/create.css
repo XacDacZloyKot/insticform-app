@@ -1,0 +1,45 @@
+/* Стили для создания аварии */
+.parameter-card {
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-gray-100);
+}
+
+.parameter-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary-200);
+}
+
+.parameter-value-field {
+    transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+    background-color: var(--color-secondary-500);
+    border-color: var(--color-secondary-500);
+}
+
+.form-check-input:focus {
+    border-color: var(--color-secondary-300);
+    box-shadow: 0 0 0 0.25rem rgba(255, 121, 0, 0.25);
+}
+
+.form-control:focus {
+    border-color: var(--color-secondary-300);
+    box-shadow: 0 0 0 0.25rem rgba(255, 121, 0, 0.25);
+}
+
+.card {
+    border: 1px solid var(--color-gray-100);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .parameter-card .card-body {
+        padding: 0.75rem;
+    }
+}

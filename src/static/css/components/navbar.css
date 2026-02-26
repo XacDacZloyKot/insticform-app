@@ -1,0 +1,53 @@
+.sidebar {
+    background: var(--color-light);
+    border: 1px var(--color-primary-100) solid;
+}
+
+header {
+    background: var(--color-light);
+    border-bottom: 1px var(--color-primary-100) solid;
+    color: var(--color-primary-500);
+}
+
+/* Кастомный цвет иконки navbar-toggler */
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+/* Кастомный цвет рамки кнопки */
+.custom-toggler {
+    border-color: var(--color-primary-400); /* Темная рамка */
+}
+
+/* Эффект нажатия */
+.custom-toggler:active,
+.custom-toggler:focus {
+    border-color: var(--color-black);; /* Темная рамка при нажатии */
+    background-color: rgba(0, 0, 0, 0.1); /* Легкий темный фон при нажатии */
+}
+
+/* Стили для кнопки в сайдбаре */
+.sidebar .btn-outline-primary {
+    border: 1px solid var(--color-primary-500);
+    color: var(--color-primary-500);
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.sidebar .btn-outline-primary:hover {
+    background-color: var(--color-primary-500);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Обеспечиваем правильную высоту для сайдбара */
+.sidebar-sticky {
+    height: 100%;
+}
+
+/* Адаптивность для мобильного сайдбара */
+@media (max-width: 767.98px) {
+    .offcanvas-body .btn-outline-primary {
+        margin-top: 1rem;
+    }
+}

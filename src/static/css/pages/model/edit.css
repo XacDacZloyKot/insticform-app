@@ -1,0 +1,23 @@
+/* static/css/model/edit.css */
+.parameter-card {
+  transition: all 0.3s ease;
+}
+
+.parameter-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .parameter-card .row > div {
+    margin-bottom: 0.5rem;
+  }
+
+  .parameter-card .remove-parameter {
+    width: 100%;
+  }
+}

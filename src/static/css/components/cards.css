@@ -1,0 +1,102 @@
+.card-header-primary {
+  background-color: var(--color-primary-500);
+  color: white;
+  border-bottom: 1px solid var(--color-primary-400);
+}
+
+.card-header-secondary {
+  background-color: var(--color-secondary-500);
+  color: white;
+  border-bottom: 1px solid var(--color-secondary-400);
+}
+
+.card-header-info {
+  background-color: var(--color-primary-300);
+  color: white;
+  border-bottom: 1px solid var(--color-primary-200);
+}
+
+.table-header-custom {
+  background-color: var(--color-primary-500) !important;
+  color: white;
+}
+
+/* Badges */
+.badge-primary {
+  background-color: var(--color-primary-500);
+  color: white;
+}
+
+.badge-secondary {
+  background-color: var(--color-secondary-500);
+  color: white;
+}
+
+.badge-success {
+  background-color: var(--color-succes);
+  color: white;
+}
+
+.badge-warning {
+  background-color: var(--color-secondary-300);
+  color: white;
+}
+
+.badge-info {
+  background-color: var(--color-primary-300);
+  color: white;
+}
+
+/* Status badges */
+.status-active {
+  background-color: var(--color-secondary-300);
+  color: white;
+}
+
+.status-completed {
+  background-color: var(--color-succes);
+  color: white;
+}
+
+.status-inactive {
+  background-color: var(--color-gray-300);
+  color: white;
+}
+
+.status-examination {
+  background-color: var(--color-primary-300);
+  color: white;
+}
+
+/* Rating */
+.rating-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-300);
+}
+
+.rating-badge.has-rating {
+  background-color: var(--color-succes);
+  color: white;
+}
+
+.rating-badge-lg {
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Stats */
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: white;
+}

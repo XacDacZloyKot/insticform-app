@@ -1,0 +1,141 @@
+/* Bootstrap-like buttons */
+.btn-orange {
+  background-color: var(--color-secondary-500);
+  border-color: var(--color-secondary-500);
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: var(--color-secondary-400);
+  border-color: var(--color-secondary-400);
+  color: white;
+}
+
+.btn-green {
+  background-color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: var(--color-primary-400);
+  border-color: var(--color-primary-400);
+  color: white;
+}
+
+.btn-gray {
+  background-color: var(--color-gray-200);
+  border-color: var(--color-gray-200);
+  color: white;
+}
+
+.btn-gray:hover {
+  background-color: var(--color-gray-300);
+  border-color: var(--color-gray-300);
+  color: white;
+}
+
+.btn-red {
+  background-color: var(--color-error);
+  border-color: var(--color-error);
+  color: white;
+}
+
+.btn-red:hover {
+  background-color: var(--color-scarlet);
+  border-color: var(--color-scarlet);
+  color: white;
+}
+
+/* Outline buttons */
+.btn-outline-orange {
+  color: var(--color-secondary-500);
+  border-color: var(--color-secondary-500);
+}
+
+.btn-outline-orange:hover {
+  background-color: var(--color-secondary-500);
+  border-color: var(--color-secondary-500);
+  color: white;
+}
+
+.btn-outline-green {
+  color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+}
+
+.btn-outline-green:hover {
+  background-color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+  color: white;
+}
+
+.btn-outline-gray {
+  color: var(--color-gray-300);
+  border-color: var(--color-gray-300);
+}
+
+.btn-outline-gray:hover {
+  background-color: var(--color-gray-300);
+  border-color: var(--color-gray-300);
+  color: white;
+}
+
+/* UI Kit buttons */
+.button {
+    -webkit-appearance: button;
+    appearance: none;
+    cursor: pointer;
+    text-rendering: auto;
+    box-shadow: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--button-height);
+    padding: var(--button-padding);
+    width: fit-content;
+    background-color: var(--color-primary-300);
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    color: var(--color-white);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:disabled {
+    color: var(--color-gray-200);
+    background-color: var(--color-gray-100);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.button:hover {
+    filter: brightness(1.1);
+}
+
+/* Button variants */
+.button.blue {
+    background-color: var(--color-primary-300);
+}
+
+.button.blue:hover { background-color: var(--color-primary-200); }
+.button.blue:active { background-color: var(--color-primary-500); }
+
+.button.orange {
+    background-color: var(--color-secondary-300);
+}
+
+.button.orange:hover { background-color: var(--color-secondary-200); }
+.button.orange:active { background-color: var(--color-secondary-500); }
+
+.button.red {
+    background-color: var(--color-scarlet);
+}
+
+.button.red:hover { background-color: var(--color-scarlet-200); }
+.button.red:active { background-color: var(--color-scarlet-400); }
+
+.button.slim {
+    height: 24px;
+    padding: 5px 10px;
+}

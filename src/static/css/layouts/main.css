@@ -1,0 +1,28 @@
+/* Specific styles for main layout */
+.main-content {
+    background-color: var(--color-background);
+}
+
+.content-section {
+    flex-grow: 1;
+    overflow: auto;
+}
+
+.menu-info p {
+    margin-bottom: 0;
+}
+
+.menu-logo {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu-logo p {
+    margin-bottom: 0;
+    font-weight: bold;
+}

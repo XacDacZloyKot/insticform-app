@@ -1,0 +1,32 @@
+/* General container styles */
+.container-fluid {
+    background-color: var(--color-background);
+}
+
+.card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-100);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Text colors */
+.text-primary {
+    color: var(--color-primary-500) !important;
+}
+
+.text-secondary {
+    color: var(--color-secondary-500) !important;
+}
+
+.text-success {
+    color: var(--color-succes) !important;
+}
+
+.text-muted {
+    color: var(--color-gray-300) !important;
+}
+
+/* General body styles */
+body {
+    background-color: var(--color-background);
+}
