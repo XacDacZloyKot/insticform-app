@@ -11,12 +11,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import JSONResponse
 
 from src.core.settings import settings
-from src.core.logging import setup_logging
-
+from src.core.log_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger("InsticForm")
-
 
 app = FastAPI(
     title="InsticForm",
@@ -47,8 +45,6 @@ app.add_middleware(
 )
 
 
-
-
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
     """Возвращает понятный JSON при ошибках валидации Pydantic-схем"""
@@ -56,6 +52,7 @@ async def validation_exception_handler(request, exc):
         status_code=422,
         content={"detail": exc.errors()},
     )
+
 
 @app.get("/ping", tags=["System"])
 async def root_ping():

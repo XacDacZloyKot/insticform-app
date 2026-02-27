@@ -18,5 +18,5 @@ def setup_logging():
         ]
     )
 
-    logger = logging.getLogger("app")
-    logger.info("Logging setup complete.")
+    logger = logging.getLogger("System")
+    logger.info("Настройки логирования успешно применены.")
