@@ -1,8 +1,12 @@
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
 from src.model.domain.base import AbstractBase
 from src.core.settings import settings
@@ -23,13 +27,14 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True
     )
 
     with context.begin_transaction():
         context.run_migrations()
 
 def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(connection=connection, target_metadata=target_metadata, render_as_batch=True)
     with context.begin_transaction():
         context.run_migrations()
 
