@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - InsticForm{% endblock %}
+
+{% block content %}
+    <div class="container-fluid vh-100 d-flex p-0">
+        <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center auth-left-panel"
+             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/logonBG.png') }}');">
+            <div class="p-5 text-center">
+                <img src="{{ url_for('static', path='/img/logo.png') }}" alt="Logo" class="mb-4" style="width: 100px; filter: brightness(0) invert(1);">
+                <h1 class="text-white fw-bold display-3 mb-3">InsticForm</h1>
+                <p class="text-white-50 fs-5 mx-auto" style="max-width: 450px;">
+                    Единое пространство для управления знаниями, проведения тестирований и глубокой аналитики успеваемости.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 d-flex align-items-center justify-content-center auth-bg-white">
+            <div class="auth-form-wrapper">
+                <div class="mb-5 text-center text-md-start">
+                    <h2 class="auth-header-title fw-extrabold mb-2">Войти</h2>
+                    <p class="text-muted">Добро пожаловать обратно! Пожалуйста, введите ваши данные.</p>
+                </div>
+
+                <form action="/auth/login" method="post" class="needs-validation">
+                    {% if error or request.query_params.get('forbidden') or request.query_params.get('registered') %}
+                    <div class="mb-4">
+                        {% if error %}
+                            <div class="alert-custom alert-custom-error mb-0 small">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                            </div>
+                        {% endif %}
+                        {% if request.query_params.get('forbidden') %}
+                            <div class="alert-custom alert-custom-error mb-0 small">
+                                <i class="bi bi-shield-lock-fill me-2"></i>Доступ к этой странице ограничен.
+                            </div>
+                        {% endif %}
+                        {% if request.query_params.get('registered') %}
+                            <div class="alert-custom alert-custom-success mb-0 small">
+                                <i class="bi bi-check-circle-fill me-2"></i>Регистрация завершена. Можете войти!
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label small fw-bold text-secondary-500">Логин</label>
+                        <input type="text" class="form-control {% if error %}input-error{% endif %}"
+                               id="username" name="username" placeholder="Ваш логин" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label small fw-bold text-secondary-500">Пароль</label>
+                        <input type="password" class="form-control {% if error %}input-error{% endif %}"
+                               id="password" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="button blue w-100 py-3 mb-4 shadow-sm fw-bold border-0">
+                        Авторизоваться
+                    </button>
+
+                    <div class="auth-divider">
+                        <span>или</span>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">Все еще нет аккаунта?
+                            <a href="/auth/register" class="text-primary-400 fw-bold text-decoration-none ms-1">Создать профиль</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

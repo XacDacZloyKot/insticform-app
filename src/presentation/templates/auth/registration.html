@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация - InsticForm{% endblock %}
+
+{% block content %}
+    <div class="container-fluid vh-100 d-flex p-0">
+        <div class="col-md-5 d-none d-md-flex flex-column justify-content-center align-items-center auth-left-panel"
+             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/logonBG.png') }}');">
+            <div class="p-5 text-center">
+                <h2 class="text-white fw-bold mb-4">Присоединяйтесь к InsticForm</h2>
+                <div class="text-start text-white-50 mx-auto" style="max-width: 350px;">
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="bi bi-check2-square text-primary-200"></i></div>
+                        <p class="mb-0">Доступ к персонализированным тестам и заданиям.</p>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3"><i class="bi bi-graph-up-arrow text-primary-200"></i></div>
+                        <p class="mb-0">Отслеживание прогресса и детальная аналитика.</p>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-3"><i class="bi bi-shield-check text-primary-200"></i></div>
+                        <p class="mb-0">Безопасная среда для проверки знаний.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-7 d-flex align-items-center justify-content-center auth-bg-white">
+            <div class="auth-register-wrapper">
+                <div class="mb-4 text-center text-md-start">
+                    <h2 class="auth-header-title fw-extrabold mb-1">Регистрация</h2>
+                    <p class="text-muted small">Создайте аккаунт, чтобы начать обучение</p>
+                </div>
+
+                <form action="/auth/register" method="post">
+                    {% if error %}
+                        <div class="alert-custom alert-custom-error mb-4 small">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label small fw-bold text-secondary-500">Логин</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="Придумайте уникальный логин" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label small fw-bold text-secondary-500">Имя</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Иван"
+                                   required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label small fw-bold text-secondary-500">Фамилия</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Иванов"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="patronymic" class="form-label small fw-bold text-secondary-500">Отчество</label>
+                        <input type="text" class="form-control" id="patronymic" name="patronymic"
+                               placeholder="Иванович (если есть)">
+                        <div class="field-hint text-end">Необязательно</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label small fw-bold text-secondary-500">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Минимум 6 символов" minlength="6" required>
+                    </div>
+
+                    <button type="submit" class="button blue w-100 py-3 mb-4 shadow-sm fw-bold border-0">
+                        Создать аккаунт
+                    </button>
+
+                    <div class="auth-divider">
+                        <span>уже есть профиль?</span>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="/auth/login" class="text-primary-400 fw-bold text-decoration-none">
+                            Вернуться на страницу входа
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
