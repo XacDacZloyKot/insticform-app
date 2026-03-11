@@ -9,5 +9,4 @@ if os.path.exists(os.path.join(BASE_DIR, "src", "presentation")):
 else:
     raise FileNotFoundError("Не найден файл шаблонов")
 
-print(TEMPLATES_DIR)
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
