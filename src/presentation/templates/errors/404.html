@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Страница не найдена{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center auth-bg-light">
+    <div class="text-center p-5 card card-custom shadow-sm" style="max-width: 600px;">
+        <h1 class="display-1 fw-bold text-primary-500">404</h1>
+        <h2 class="fw-bold text-secondary-500 mb-4">Упс! Страница потерялась</h2>
+        <p class="confirm-text mb-5">
+            Похоже, адрес был введен неверно или страница, которую вы ищете, больше не существует.
+        </p>
+        
+        <div class="d-flex justify-content-center gap-3">
+            <a href="javascript:history.back()" class="button slate justify-content-center">
+                Вернуться назад
+            </a>
+            <a href="/home/student" class="button blue justify-content-center">
+                На главную
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
