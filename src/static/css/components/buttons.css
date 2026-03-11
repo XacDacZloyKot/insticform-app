@@ -1,25 +1,25 @@
 /* Bootstrap-like buttons */
-.btn-orange {
+.btn-slate {
   background-color: var(--color-secondary-500);
   border-color: var(--color-secondary-500);
   color: white;
 }
 
-.btn-orange:hover {
+.btn-slate:hover {
   background-color: var(--color-secondary-400);
   border-color: var(--color-secondary-400);
   color: white;
 }
 
 .btn-green {
-  background-color: var(--color-primary-500);
-  border-color: var(--color-primary-500);
+  background-color: var(--color-succes);
+  border-color: var(--color-succes);
   color: white;
 }
 
 .btn-green:hover {
-  background-color: var(--color-primary-400);
-  border-color: var(--color-primary-400);
+  background-color: #059669; /* Темно-зеленый при наведении */
+  border-color: #059669;
   color: white;
 }
 
@@ -48,36 +48,25 @@
 }
 
 /* Outline buttons */
-.btn-outline-orange {
+.btn-outline-slate {
   color: var(--color-secondary-500);
-  border-color: var(--color-secondary-500);
+  border: 1px solid var(--color-secondary-500);
+  background: transparent;
 }
 
-.btn-outline-orange:hover {
+.btn-outline-slate:hover {
   background-color: var(--color-secondary-500);
-  border-color: var(--color-secondary-500);
   color: white;
 }
 
-.btn-outline-green {
+.btn-outline-primary {
   color: var(--color-primary-500);
-  border-color: var(--color-primary-500);
+  border: 1px solid var(--color-primary-500);
+  background: transparent;
 }
 
-.btn-outline-green:hover {
+.btn-outline-primary:hover {
   background-color: var(--color-primary-500);
-  border-color: var(--color-primary-500);
-  color: white;
-}
-
-.btn-outline-gray {
-  color: var(--color-gray-300);
-  border-color: var(--color-gray-300);
-}
-
-.btn-outline-gray:hover {
-  background-color: var(--color-gray-300);
-  border-color: var(--color-gray-300);
   color: white;
 }
 
@@ -95,11 +84,11 @@
     height: var(--button-height);
     padding: var(--button-padding);
     width: fit-content;
-    background-color: var(--color-primary-300);
+    background-color: var(--color-primary-400);
     border-radius: var(--border-radius);
-    font-weight: 700;
+    font-weight: 600;
     color: var(--color-white);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 .button:disabled {
@@ -109,33 +98,32 @@
     pointer-events: none;
 }
 
-.button:hover {
-    filter: brightness(1.1);
+.button:active {
+    transform: translateY(1px);
 }
 
 /* Button variants */
 .button.blue {
-    background-color: var(--color-primary-300);
+    background-color: var(--color-primary-400);
 }
-
-.button.blue:hover { background-color: var(--color-primary-200); }
+.button.blue:hover { background-color: var(--color-primary-300); }
 .button.blue:active { background-color: var(--color-primary-500); }
 
-.button.orange {
-    background-color: var(--color-secondary-300);
+/* Заменили orange на slate (сине-серый) */
+.button.slate {
+    background-color: var(--color-secondary-400);
 }
-
-.button.orange:hover { background-color: var(--color-secondary-200); }
-.button.orange:active { background-color: var(--color-secondary-500); }
+.button.slate:hover { background-color: var(--color-secondary-300); }
+.button.slate:active { background-color: var(--color-secondary-500); }
 
 .button.red {
-    background-color: var(--color-scarlet);
+    background-color: var(--color-error);
 }
-
-.button.red:hover { background-color: var(--color-scarlet-200); }
-.button.red:active { background-color: var(--color-scarlet-400); }
+.button.red:hover { background-color: var(--color-scarlet-400); }
+.button.red:active { background-color: var(--color-scarlet); }
 
 .button.slim {
-    height: 24px;
-    padding: 5px 10px;
+    height: 28px;
+    padding: 4px 12px;
+    font-size: 0.875rem;
 }

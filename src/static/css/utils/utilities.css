@@ -150,3 +150,13 @@
     .w-xll-95 { width: 95%!important; }
     .w-xll-100 { width: 100%!important; }
 }
+
+.text-primary-500 { color: var(--color-primary-500) !important; }
+.text-primary-400 { color: var(--color-primary-400) !important; }
+.text-secondary-500 { color: var(--color-secondary-500) !important; }
+
+/* Custom Text Utilities */
+.text-semibold { font-weight: 500 !important; }
+.text-bold { font-weight: 600 !important; }
+.text-decoration-none { text-decoration: none !important; }
+.text-decoration-none:hover { text-decoration: underline !important; }

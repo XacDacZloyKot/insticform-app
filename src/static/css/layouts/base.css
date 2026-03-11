@@ -25,8 +25,8 @@
 .text-muted {
     color: var(--color-gray-300) !important;
 }
-
 /* General body styles */
 body {
-    background-color: var(--color-background);
+    background-color: var(--color-light-100);
+    font-family: inherit;
 }

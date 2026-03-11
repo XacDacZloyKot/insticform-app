@@ -14,5 +14,7 @@
 
 /* Layouts */
 @import "layouts/base.css";
-@import "layouts/auth.css";
-@import "layouts/main.css";
+
+/* Pages */
+@import "pages/auth/auth.css";
+@import "pages/dashboard/dashboard.css";

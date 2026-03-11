@@ -49,28 +49,31 @@ input.form-control:disabled {
     text-align: center;
     margin: 0;
     border-radius: var(--border-radius);
+    font-weight: 500;
+    font-size: 0.875rem;
 }
 
 .status-red {
-    border: 1px solid var(--color-error);
-    background-color: #FFBBBB;
-    color: var(--color-error);
+    border: 1px solid var(--color-scarlet-400);
+    background-color: var(--color-scarlet-100);
+    color: var(--color-scarlet);
 }
 
 .status-green {
-    border: 1px solid #19B000;
-    background-color: #D4F7CE;
-    color: #19B000;
+    border: 1px solid #34D399;
+    background-color: #D1FAE5;
+    color: #065F46;
 }
 
-.status-orange {
-    border: 1px solid var(--color-secondary-500);
-    background-color: #FFDAB8;
+/* Заменили оранжевый статус на сине-серый (slate) */
+.status-slate {
+    border: 1px solid var(--color-secondary-300);
+    background-color: var(--color-secondary-100);
     color: var(--color-secondary-500);
 }
 
 .status-blue {
-    border: 1px solid #318ADC;
-    background-color: #BBDEFF;
-    color: #318ADC;
+    border: 1px solid var(--color-primary-200);
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-500);
 }

@@ -100,3 +100,8 @@
   font-size: 0.875rem;
   color: white;
 }
+
+.card-custom {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-primary-100);
+}

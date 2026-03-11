@@ -21,3 +21,24 @@
     border-color: #bee5eb;
     color: #0c5460;
 }
+
+/* Custom Alerts */
+.alert-custom {
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.alert-custom-error {
+    border: 1px solid var(--color-scarlet-400);
+    background-color: var(--color-scarlet-100);
+    color: #991B1B; /* Темно красный для читаемости */
+}
+
+.alert-custom-success {
+    border: 1px solid #34D399;
+    background-color: #D1FAE5;
+    color: #065F46; /* Темно зеленый для читаемости */
+}

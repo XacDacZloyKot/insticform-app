@@ -1,31 +1,39 @@
 :root {
-  /* Цветовая палитра */
+  /* Базовые фоны */
   --color-background: #FFFFFF;
-  --color-primary-500: #072B5F;
-  --color-primary-400: #244472;
-  --color-primary-300: #415D85;
-  --color-primary-200: #6D82A1;
-  --color-primary-100: #A7B4C7;
-  --color-black: #000000;
+  --color-light-100: #F4F7F9; /* Очень мягкий холодный фон для body */
+  --color-light-200: #E2E8F0; /* Чуть темнее для рамок и плашек */
+  --color-light: #F0F4F8;     /* Фон для левой панели/сайдбара */
+
+  /* Primary Colors (Современный сочный синий) */
+  --color-primary-500: #1D4ED8; /* Глубокий синий (для акцентов и заголовков) */
+  --color-primary-400: #2563EB; /* Яркий синий (для кнопок) */
+  --color-primary-300: #3B82F6; /* Мягкий синий (для ховеров) */
+  --color-primary-200: #93C5FD; /* Светло-синий (для выделения) */
+  --color-primary-100: #DBEAFE; /* Очень светлый синий (для фонов элементов) */
+
+  /* Secondary Colors */
+  --color-secondary-500: #475569; /* Slate 600 - Темный сине-серый */
+  --color-secondary-400: #64748B; /* Slate 500 - Базовый сине-серый */
+  --color-secondary-300: #94A3B8; /* Slate 400 - Светлый сине-серый */
+  --color-secondary-200: #CBD5E1; /* Slate 300 */
+  --color-secondary-100: #F1F5F9; /* Slate 100 */
+
+  /* Нейтральные цвета (Тексты и бордеры) */
+  --color-black: #0F172A;
   --color-white: #FFFFFF;
-  --color-light-100: #FFF6EF;
-  --color-light-200: #E6E8E6;
-  --color-light: #DFECF0;
-  --color-gray-100: #DCDCDC;
-  --color-gray-200: #AAAAAA;
-  --color-gray-300: #B8B8B8;
-  --color-secondary-500: #FF7900;
-  --color-secondary-400: #FF891E;
-  --color-secondary-300: #FF993C;
-  --color-secondary-200: #FFB069;
-  --color-secondary-100: #FFD0A5;
-  --color-error: #FF1E1E;
-  --color-scarlet: #ff5050;
-  --color-scarlet-400: #ff7171;
-  --color-scarlet-300: #ff6d6d;
-  --color-scarlet-200: #ff6e6e;
-  --color-scarlet-100: #ff6868;
-  --color-succes: #20af00;
+  --color-gray-100: #E2E8F0;
+  --color-gray-200: #94A3B8;
+  --color-gray-300: #64748B;
+
+  /* Системные статусы */
+  --color-succes: #10B981;
+  --color-error: #EF4444;
+  --color-scarlet: #DC2626;
+  --color-scarlet-400: #F87171;
+  --color-scarlet-300: #FCA5A5;
+  --color-scarlet-200: #FECACA;
+  --color-scarlet-100: #FEE2E2;
 
   /* Размеры */
   --button-height: 42px;
