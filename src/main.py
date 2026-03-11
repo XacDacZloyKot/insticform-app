@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 
 import uvicorn
 from fastapi import FastAPI
@@ -8,10 +7,16 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.requests import Request
 
 from src.core.settings import settings
 from src.core.log_config import setup_logging
+from src.core.templates import templates
+
+from src.presentation.routes.auth import router as auth_router
+from src.presentation.routes.home import router as home_router
 
 setup_logging()
 logger = logging.getLogger("InsticForm")
@@ -44,14 +49,44 @@ app.add_middleware(
     session_cookie="session",
 )
 
+app.include_router(auth_router)
+app.include_router(home_router)
+
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Возвращает понятный JSON при ошибках валидации Pydantic-схем"""
     return JSONResponse(
         status_code=422,
         content={"detail": exc.errors()},
     )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Умный обработчик HTTP ошибок для SSR (Jinja2)."""
+    if request.url.path.startswith("/api/"):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail}
+        )
+
+    if exc.status_code == 401:
+        next_url = request.url.path
+        return RedirectResponse(
+            url=f"/auth/refresh?next_url={next_url}",
+            status_code=303
+        )
+
+    if exc.status_code == 403:
+        logger.warning(f"Попытка несанкционированного доступа к {request.url.path}")
+        url = request.url_for("get_login_page").include_query_params(forbidden="true")
+        return RedirectResponse(url=url, status_code=303)
+
+    if exc.status_code == 404:
+        return templates.TemplateResponse("errors/404.html", {"request": request}, status_code=404)
+
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
 @app.get("/ping", tags=["System"])
@@ -71,5 +106,4 @@ if __name__ == "__main__":
             reload=settings.run.reload,
         )
     except Exception as e:
-        logger.error(f"Критическая ошибка при запуске: {e}", exc_info=True)
-        sys.exit(1)
+        logger.error(f"Ошибка при запуске сервера: {str(e)}")
