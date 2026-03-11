@@ -1,0 +1,80 @@
+/* Общие настройки для страниц авторизации */
+.auth-bg-white {
+    background-color: var(--color-background); /* #FFFFFF */
+}
+
+/* Обертка формы: делаем её более выразительной */
+.auth-form-wrapper {
+    max-width: 440px;
+    width: 100%;
+    padding: 2.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    /* Мягкая многослойная тень для эффекта глубины */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 20px 25px -5px rgba(7, 43, 95, 0.05);
+}
+
+/* Стили заголовка */
+.auth-header-title {
+    font-size: 2.25rem;
+    letter-spacing: -0.025em;
+    line-height: 2.5rem;
+    color: var(--color-primary-500); /* */
+}
+
+/* Кастомизация полей ввода */
+input.form-control {
+    border: 1.5px solid var(--color-light-200) !important; /* */
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+input.form-control:focus {
+    border-color: var(--color-primary-400) !important; /* */
+    box-shadow: 0 0 0 4px var(--color-primary-100) !important; /* */
+}
+
+/* Разделитель */
+.auth-divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.auth-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--color-light-200); /* */
+    z-index: 1;
+}
+
+.auth-divider span {
+    position: relative;
+    background-color: #fff;
+    padding: 0 0.75rem;
+    color: var(--color-gray-200); /* */
+    font-size: 0.875rem;
+    z-index: 2;
+}
+
+/* Увеличенная ширина для регистрации, чтобы поля в ряд не теснились */
+.auth-register-wrapper {
+    max-width: 550px;
+    width: 100%;
+    padding: 2.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(7, 43, 95, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Стили для маленьких подписей под полями */
+.field-hint {
+    font-size: 0.75rem;
+    color: var(--color-gray-200);
+    margin-top: 0.25rem;
+}
