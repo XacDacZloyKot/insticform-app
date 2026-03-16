@@ -1,33 +1,63 @@
+/* Фиксация сайдбара на Desktop */
 .sidebar {
-    background: var(--color-light);
-    border: 1px var(--color-primary-100) solid;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
 }
 
-/* Navigation buttons */
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Стилизация ссылок меню */
 .nav-btn {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    padding: 3px 15px;
-    gap: 15px;
-    border-radius: var(--border-radius);
-    color: var(--color-black);
-    font-size: 13px;
-    font-family: inherit;
-    font-weight: 400;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.nav-btn img {
-    width: 25px;
-    height: 25px;
+    transition: all 0.2s ease-in-out;
 }
 
 .nav-btn:hover {
-    background-color: var(--color-primary-100);
+    background-color: #f8f9fa;
+    color: #0d6efd !important;
+    transform: translateX(4px);
 }
 
-.nav-btn-selected {
-    background-color: var(--color-primary-200);
-    color: var(--color-white);
+.nav-btn:hover i {
+    color: #0d6efd !important;
+}
+
+/* Кастомный скроллбар для меню */
+.sidebar-sticky::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar-sticky::-webkit-scrollbar-thumb {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+/* Стили для SVG иконок в меню */
+.sidebar-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.6; /* Делаем их слегка блеклыми по умолчанию */
+}
+
+/* Делаем иконку ярче при наведении или на активной вкладке */
+.nav-item-link:hover .sidebar-icon,
+.nav-item-link.active .sidebar-icon {
+    opacity: 1;
+}
+
+/* Для мобильного бургер-меню */
+.menu-toggler-icon {
+    width: 28px;
+    height: 28px;
 }
