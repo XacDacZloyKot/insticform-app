@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "base/base_auth.html" %}
 
 {% block title %}Регистрация - InsticForm{% endblock %}
 
 {% block content %}
     <div class="container-fluid vh-100 d-flex p-0">
         <div class="col-md-5 d-none d-md-flex flex-column justify-content-center align-items-center auth-left-panel"
-             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/logonBG.png') }}');">
+             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/LogoBG.png') }}');">
             <div class="p-5 text-center">
                 <h2 class="text-white fw-bold mb-4">Присоединяйтесь к InsticForm</h2>
                 <div class="text-start text-white-50 mx-auto" style="max-width: 350px;">

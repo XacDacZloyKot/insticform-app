@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+
+{% block title %}Создание группы{% endblock %}
+{% block header_title %}Академические группы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-custom p-4 shadow-sm border-0">
+            <h4 class="fw-bold text-primary mb-4">Новая группа</h4>
+            
+            {% if success %}
+                <div class="alert alert-success py-2">Группа успешно создана!</div>
+            {% endif %}
+            {% if error %}
+                <div class="alert alert-danger py-2">{{ error }}</div>
+            {% endif %}
+
+            <form action="/academic/create/group" method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Название группы</label>
+                    <input type="text" class="form-control" name="name" placeholder="Например: ИВТ-21" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Создать группу</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

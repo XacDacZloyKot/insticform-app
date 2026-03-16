@@ -1,10 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base/base.html" %}
 
-</body>
-</html>
+{% block title %}Панель администратора{% endblock %}
+{% block header_title %}Администрирование{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card card-custom p-4 shadow-sm border-0 mb-4">
+            <h3 class="fw-bold mb-3 text-primary">Системная сводка</h3>
+            <p class="fs-5 text-secondary">Привет, <strong>{{ user.first_name }}</strong>! Главная панель управления платформой.</p>
+            
+            <hr class="text-muted my-3">
+            
+            <div class="row mt-4">
+                <div class="col-md-4 mb-3">
+                    <div class="p-4 bg-light rounded shadow-sm d-flex align-items-center gap-3 border">
+                        <div class="bg-primary text-white rounded p-3 d-flex align-items-center justify-content-center">
+                            <img src="{{ url_for('static', path='/img/Users.svg') }}" style="width: 24px; filter: brightness(0) invert(1);" alt="Пользователи">
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0">Пользователи</h4>
+                            <a href="#" class="text-decoration-none small text-muted">Управление <span class="fs-5">→</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="p-4 bg-light rounded shadow-sm d-flex align-items-center gap-3 border">
+                        <div class="bg-success text-white rounded p-3 d-flex align-items-center justify-content-center">
+                            <img src="{{ url_for('static', path='/img/Groups.svg') }}" style="width: 24px; filter: brightness(0) invert(1);" alt="Группы">
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0">Группы</h4>
+                            <a href="#" class="text-decoration-none small text-muted">Смотреть список <span class="fs-5">→</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="p-4 bg-light rounded shadow-sm d-flex align-items-center gap-3 border">
+                        <div class="bg-warning text-dark rounded p-3 d-flex align-items-center justify-content-center">
+                            <img src="{{ url_for('static', path='/img/Book.svg') }}" style="width: 24px;" alt="Дисциплины">
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-0">Дисциплины</h4>
+                            <a href="#" class="text-decoration-none small text-muted">Настроить <span class="fs-5">→</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

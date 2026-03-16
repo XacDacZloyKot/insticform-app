@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/components/navbar.css') }}">
+
+    {% block css %}{% endblock %}
+    <title>{% block title %}InsticForm{% endblock %}</title>
+</head>
+<body class="d-flex flex-column vh-100 bg-light">
+
+{% macro render_navigation() %}
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <p class="nav-category__title text-muted small fw-bold text-uppercase mt-3 mb-2 px-3">Основное</p>
+            <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if 'home' in request.url.path %}bg-light rounded{% endif %}"
+               href="{% if user.role.value == 'admin' %}{{ url_for('get_home_admin_page') }}{% elif user.role.value == 'teacher' %}{{ url_for('get_home_teacher_page') }}{% else %}{{ url_for('get_home_student_page') }}{% endif %}">
+                <img src="{{ url_for('static', path='/img/Home.svg') }}" alt="Главная" class="sidebar-icon"> Главная
+            </a>
+        </li>
+
+        {% if user.role.value == 'admin' %}
+            <li class="nav-item">
+                <p class="nav-category__title text-muted small fw-bold text-uppercase mt-4 mb-2 px-3">Управление</p>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/users/create/teacher' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/users/create/teacher">
+                    <img src="{{ url_for('static', path='/img/Users.svg') }}" alt="Пользователи" class="sidebar-icon">
+                    Преподаватели
+                </a>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/create/group' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/academic/create/group">
+                    <img src="{{ url_for('static', path='/img/Groups.svg') }}" alt="Группы" class="sidebar-icon">
+                    Академ. группы
+                </a>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/create/discipline' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/academic/create/discipline">
+                    <img src="{{ url_for('static', path='/img/Book.svg') }}" alt="Дисциплины" class="sidebar-icon">
+                    Дисциплины
+                </a>
+            </li>
+        {% endif %}
+
+        {% if user.role.value in ['admin', 'teacher'] %}
+            <li class="nav-item">
+                <p class="nav-category__title text-muted small fw-bold text-uppercase mt-4 mb-2 px-3">Тестирование</p>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2" href="#">
+                    <img src="{{ url_for('static', path='/img/Tests.svg') }}" alt="Банк тестов" class="sidebar-icon">
+                    Банк тестов
+                </a>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2" href="#">
+                    <img src="{{ url_for('static', path='/img/Questions.svg') }}" alt="Вопросы" class="sidebar-icon">
+                    Вопросы
+                </a>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2" href="#">
+                    <img src="{{ url_for('static', path='/img/Stats.svg') }}" alt="Статистика" class="sidebar-icon">
+                    Статистика
+                </a>
+            </li>
+        {% endif %}
+
+        {% if user.role.value == 'student' %}
+            <li class="nav-item">
+                <p class="nav-category__title text-muted small fw-bold text-uppercase mt-4 mb-2 px-3">Обучение</p>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2" href="#">
+                    <img src="{{ url_for('static', path='/img/Tests.svg') }}" alt="Доступные тесты"
+                         class="sidebar-icon"> Доступные тесты
+                </a>
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2" href="#">
+                    <img src="{{ url_for('static', path='/img/Results.svg') }}" alt="Мои результаты"
+                         class="sidebar-icon"> Мои результаты
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endmacro %}
+
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-none d-md-block sidebar bg-white border-end px-0">
+            <div class="sidebar-sticky pt-3 d-flex flex-column h-100">
+                <div class="flex-grow-1 px-2">
+                    <div class="d-flex align-items-center gap-2 px-3 mb-4">
+                        <img src="{{ url_for('static', path='/img/Logo.png') }}" alt="Логотип" style="width: 32px;">
+                        <span class="fw-bold fs-5 text-primary">InsticForm</span>
+                    </div>
+
+                    {{ render_navigation() }}
+                </div>
+            </div>
+        </nav>
+
+        <div class="offcanvas offcanvas-start bg-white" tabindex="-1" id="mobileSidebar">
+            <div class="offcanvas-header border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="{{ url_for('static', path='/img/Logo.png') }}" alt="Логотип" style="width: 24px;">
+                    <h5 class="offcanvas-title fw-bold text-primary m-0">InsticForm</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body d-flex flex-column h-100 px-2">
+                <div class="flex-grow-1">
+                    {{ render_navigation() }}
+                </div>
+            </div>
+        </div>
+
+        <main role="main" class="col-md-9 ms-sm-auto p-0 col-lg-10 d-flex flex-column h-100 bg-light">
+            <header class="navbar sticky-top p-2 bg-white border-bottom shadow-sm d-flex align-items-center px-4">
+                <button class="navbar-toggler d-md-none border-0 p-0 me-3" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#mobileSidebar">
+                    <img src="{{ url_for('static', path='/img/Menu.svg') }}" alt="Меню" class="menu-toggler-icon">
+                </button>
+
+                <div class="fw-bold fs-5 text-secondary">
+                    {% block header_title %}Панель управления{% endblock %}
+                </div>
+
+                <div class="d-flex align-items-center ms-auto">
+                    <div class="menu-info text-end d-none d-sm-block me-3">
+                        <p class="mb-0 fw-bold" style="font-size: 0.9rem;">
+                            {{ user.last_name }} {{ user.first_name }}
+                        </p>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">
+                            {% if user.role.value == 'admin' %}Администратор
+                            {% elif user.role.value == 'teacher' %}Преподаватель
+                            {% else %}Студент{% endif %}
+                        </p>
+                    </div>
+
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 40px; height: 40px; font-weight: 600;">
+                        {{ user.first_name[0] | upper }}{{ user.last_name[0] | upper }}
+                    </div>
+
+                    <form action="/auth/logout" method="POST" class="m-0 ms-3">
+                        <button type="submit" class="border-0 bg-transparent p-0" title="Выйти">
+                            <img src="{{ url_for('static', path='/img/Exit.svg') }}" alt="Выход"
+                                 style="width: 24px; height: 24px; opacity: 0.7; transition: 0.2s;"
+                                 onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <section class="content flex-grow-1 overflow-auto p-4">
+                {% block content %}{% endblock %}
+            </section>
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+{% block script %}{% endblock %}
+</body>
+</html>

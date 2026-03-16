@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% block title %}Создание дисциплины{% endblock %}
+{% block header_title %}Дисциплины{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="card card-custom p-4 shadow-sm border-0">
+            <h4 class="fw-bold text-primary mb-4">Новая дисциплина</h4>
+            {% if success %} <div class="alert alert-success py-2">Дисциплина успешно создана!</div> {% endif %}
+            {% if error %} <div class="alert alert-danger py-2">{{ error }}</div> {% endif %}
+
+            <form action="/academic/create/discipline" method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Название дисциплины</label>
+                    <input type="text" class="form-control" name="name" placeholder="Математический анализ" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold small text-secondary">Описание (необязательно)</label>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Краткая сводка по предмету..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary px-4 fw-bold">Сохранить дисциплину</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

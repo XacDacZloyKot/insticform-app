@@ -1,13 +1,13 @@
-{% extends "base.html" %}
+{% extends "base/base_auth.html" %}
 
 {% block title %}Вход - InsticForm{% endblock %}
 
 {% block content %}
     <div class="container-fluid vh-100 d-flex p-0">
         <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center auth-left-panel"
-             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/logonBG.png') }}');">
+             style="background-image: linear-gradient(rgba(7, 43, 95, 0.8), rgba(7, 43, 95, 0.9)), url('{{ url_for('static', path='/img/LogoBG.png') }}');">
             <div class="p-5 text-center">
-                <img src="{{ url_for('static', path='/img/logo.png') }}" alt="Logo" class="mb-4" style="width: 100px; filter: brightness(0) invert(1);">
+                <img src="{{ url_for('static', path='/img/Logo.png') }}" alt="Logo" class="mb-4" style="width: 100px; filter: brightness(0) invert(1);">
                 <h1 class="text-white fw-bold display-3 mb-3">InsticForm</h1>
                 <p class="text-white-50 fs-5 mx-auto" style="max-width: 450px;">
                     Единое пространство для управления знаниями, проведения тестирований и глубокой аналитики успеваемости.
