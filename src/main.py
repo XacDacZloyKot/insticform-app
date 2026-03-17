@@ -18,6 +18,9 @@ from src.core.templates import templates
 
 from src.presentation.routes.auth import router as auth_router
 from src.presentation.routes.home import router as home_router
+from src.presentation.routes.users import router as users_router
+from src.presentation.routes.academic import router as academic_router
+
 
 setup_logging()
 logger = logging.getLogger("InsticForm")
@@ -52,6 +55,8 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(home_router)
+app.include_router(users_router)
+app.include_router(academic_router)
 
 
 @app.exception_handler(RequestValidationError)

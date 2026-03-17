@@ -3,17 +3,27 @@ from pydantic import BaseModel, ConfigDict
 
 from src.model.domain.enums import GradingMethod, QuestionType
 
-# --- Варианты ответов ---
+# ВАРИАНТЫ ОТВЕТОВ
 class AnswerOptionBase(BaseModel):
     text: str
+
+class AnswerOptionCreate(AnswerOptionBase):
+    """Схема для создания варианта ответа (содержит веса и правильность)"""
     is_correct: bool = False
     score_weight: float = 1.0
 
-class AnswerOptionResponse(AnswerOptionBase):
+class AnswerOptionStudentResponse(AnswerOptionBase):
+    """БЕЗОПАСНАЯ схема для студента: отдаем только ID и текст, никаких правильных ответов!"""
     id: int
     model_config = ConfigDict(from_attributes=True)
 
-# --- Вопросы ---
+class AnswerOptionTeacherResponse(AnswerOptionStudentResponse):
+    """Схема для преподавателя/админа: содержит правильные ответы и веса"""
+    is_correct: bool
+    score_weight: float
+
+
+# ВОПРОСЫ
 class QuestionBase(BaseModel):
     text: str
     media_url: Optional[str] = None
@@ -21,12 +31,22 @@ class QuestionBase(BaseModel):
     time_limit_seconds: Optional[int] = None
     allow_partial_credit: bool = False
 
-class QuestionResponse(QuestionBase):
+class QuestionCreate(QuestionBase):
+    """Позволяет создать вопрос сразу с вариантами ответов"""
+    options: List[AnswerOptionCreate] = []
+
+class QuestionStudentResponse(QuestionBase):
     id: int
-    options: List[AnswerOptionResponse] = [] # Вкладываем варианты ответов
+    options: List[AnswerOptionStudentResponse] = []
     model_config = ConfigDict(from_attributes=True)
 
-# --- Тесты ---
+class QuestionTeacherResponse(QuestionBase):
+    id: int
+    options: List[AnswerOptionTeacherResponse] = []
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ТЕСТЫ
 class TestBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -35,9 +55,23 @@ class TestBase(BaseModel):
     questions_to_show: Optional[int] = None
     grading_method: GradingMethod = GradingMethod.AUTO
 
-class TestResponse(TestBase):
+class TestCreate(TestBase):
+    """Позволяет создать тест сразу со всеми вопросами и ответами одним JSON"""
+    discipline_id: int
+    questions: List[QuestionCreate] = []
+
+class TestStudentResponse(TestBase):
+    """Безопасная схема отдачи теста студенту"""
     id: int
     discipline_id: int
     creator_id: Optional[int] = None
-    questions: List[QuestionResponse] = []
+    questions: List[QuestionStudentResponse] = []
+    model_config = ConfigDict(from_attributes=True)
+
+class TestTeacherResponse(TestBase):
+    """Полная схема отдачи теста для режима редактирования"""
+    id: int
+    discipline_id: int
+    creator_id: Optional[int] = None
+    questions: List[QuestionTeacherResponse] = []
     model_config = ConfigDict(from_attributes=True)

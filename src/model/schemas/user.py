@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
 from src.model.domain.enums import UserRole
 
@@ -7,7 +8,7 @@ class UserBase(BaseModel):
     username: str
     first_name: str
     last_name: str
-    patronymic: str
+    patronymic: Optional[str] = None
     role: UserRole = UserRole.STUDENT
 
 
