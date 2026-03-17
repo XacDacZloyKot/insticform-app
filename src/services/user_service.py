@@ -5,7 +5,6 @@ from sqlalchemy.orm import selectinload
 
 from src.core.utils.auth import tokens
 from src.core.utils.auth.password import verify_password
-from src.model.domain.enums import UserRole
 from src.model.domain.user import User
 from src.model.schemas.user import UserCreate
 from src.repositories.user_repository import UserRepository
@@ -89,19 +88,19 @@ class UserService:
             order_by: Optional[str] = None,
             order_direction: Optional[str] = "asc",
             offset: Optional[int] = None,
-            limit: Optional[int] = None
+            limit: Optional[int] = None,
+            **filters
     ) -> List[User]:
         """Получение списка пользователей с подгрузкой групп."""
         try:
-            # Подгружаем связанные учебные группы
             joins = [selectinload(User.groups)]
-
             return await self.user_repository.list_with_joins(
                 order_by=order_by,
                 order_direction=order_direction,
                 offset=offset,
                 limit=limit,
-                joins=joins
+                joins=joins,
+                **filters
             )
         except Exception as e:
             logger.error(f"Ошибка при получении списка пользователей: {str(e)}")
@@ -114,3 +113,20 @@ class UserService:
             logger.info(f"Пользователь ID {user_id} успешно удален")
         except ValueError:
             raise
+
+    async def update_user(self, user_id: int, update_data: dict) -> User:
+        """Обновление пользователя."""
+        user = await self.user_repository.get_one(id=user_id)
+
+        if "username" in update_data and update_data["username"] != user.username:
+            existing = await self.user_repository.get_by_username(username=update_data["username"])
+            if existing:
+                raise ValueError(f"Пользователь с логином '{update_data['username']}' уже существует")
+
+        if update_data.get("password"):
+            from src.core.utils.auth.password import hash_password
+            update_data["hashed_password"] = hash_password(update_data.pop("password"))
+        else:
+            update_data.pop("password", None)
+
+        return await self.user_repository.update(id=user_id, data=update_data)
