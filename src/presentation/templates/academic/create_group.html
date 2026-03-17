@@ -1,27 +1,27 @@
 {% extends "base/base.html" %}
 
-{% block title %}Создание группы{% endblock %}
+{% block title %}{% if edit_mode %}Редактирование группы{% else %}Создание группы{% endif %}{% endblock %}
 {% block header_title %}Академические группы{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-6 col-lg-4">
         <div class="card card-custom p-4 shadow-sm border-0">
-            <h4 class="fw-bold text-primary mb-4">Новая группа</h4>
-            
-            {% if success %}
-                <div class="alert alert-success py-2">Группа успешно создана!</div>
-            {% endif %}
-            {% if error %}
-                <div class="alert alert-danger py-2">{{ error }}</div>
-            {% endif %}
+            <h4 class="fw-bold text-primary mb-4">
+                {% if edit_mode %}Изменить группу{% else %}Новая группа{% endif %}
+            </h4>
 
-            <form action="/academic/create/group" method="post">
+            {% if success %} <div class="alert alert-success py-2">Успешно сохранено!</div> {% endif %}
+            {% if error %} <div class="alert alert-danger py-2">{{ error }}</div> {% endif %}
+
+            <form action="{% if edit_mode %}/academic/groups/{{ group.id }}/edit{% else %}/academic/create/group{% endif %}" method="post">
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Название группы</label>
-                    <input type="text" class="form-control" name="name" placeholder="Например: ИВТ-21" required>
+                    <input type="text" class="form-control" name="name" value="{{ group.name if edit_mode else '' }}" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold">Создать группу</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">
+                    {% if edit_mode %}Сохранить изменения{% else %}Создать группу{% endif %}
+                </button>
             </form>
         </div>
     </div>

@@ -26,18 +26,18 @@
         {% if user.role.value == 'admin' %}
             <li class="nav-item">
                 <p class="nav-category__title text-muted small fw-bold text-uppercase mt-4 mb-2 px-3">Управление</p>
-                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/users/create/teacher' in request.url.path %}bg-light rounded{% endif %}"
-                   href="/users/create/teacher">
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/users' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/users">
                     <img src="{{ url_for('static', path='/img/Users.svg') }}" alt="Пользователи" class="sidebar-icon">
-                    Преподаватели
+                    Пользователи
                 </a>
-                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/create/group' in request.url.path %}bg-light rounded{% endif %}"
-                   href="/academic/create/group">
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/groups' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/academic/groups">
                     <img src="{{ url_for('static', path='/img/Groups.svg') }}" alt="Группы" class="sidebar-icon">
                     Академ. группы
                 </a>
-                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/create/discipline' in request.url.path %}bg-light rounded{% endif %}"
-                   href="/academic/create/discipline">
+                <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if '/academic/disciplines' in request.url.path %}bg-light rounded{% endif %}"
+                   href="/academic/disciplines">
                     <img src="{{ url_for('static', path='/img/Book.svg') }}" alt="Дисциплины" class="sidebar-icon">
                     Дисциплины
                 </a>

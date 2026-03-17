@@ -1,25 +1,30 @@
 {% extends "base/base.html" %}
-{% block title %}Создание дисциплины{% endblock %}
+{% block title %}{% if edit_mode %}Редактирование дисциплины{% else %}Создание дисциплины{% endif %}{% endblock %}
 {% block header_title %}Дисциплины{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 col-lg-6">
         <div class="card card-custom p-4 shadow-sm border-0">
-            <h4 class="fw-bold text-primary mb-4">Новая дисциплина</h4>
-            {% if success %} <div class="alert alert-success py-2">Дисциплина успешно создана!</div> {% endif %}
+            <h4 class="fw-bold text-primary mb-4">
+                {% if edit_mode %}Изменить дисциплину{% else %}Новая дисциплина{% endif %}
+            </h4>
+
+            {% if success %} <div class="alert alert-success py-2">Успешно сохранено!</div> {% endif %}
             {% if error %} <div class="alert alert-danger py-2">{{ error }}</div> {% endif %}
 
-            <form action="/academic/create/discipline" method="post">
+            <form action="{% if edit_mode %}/academic/disciplines/{{ discipline.id }}/edit{% else %}/academic/create/discipline{% endif %}" method="post">
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Название дисциплины</label>
-                    <input type="text" class="form-control" name="name" placeholder="Математический анализ" required>
+                    <input type="text" class="form-control" name="name" placeholder="Математический анализ" value="{{ discipline.name if edit_mode else '' }}" required>
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-bold small text-secondary">Описание (необязательно)</label>
-                    <textarea class="form-control" name="description" rows="3" placeholder="Краткая сводка по предмету..."></textarea>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Краткая сводка по предмету...">{{ discipline.description if edit_mode and discipline.description else '' }}</textarea>
                 </div>
-                <button type="submit" class="btn btn-primary px-4 fw-bold">Сохранить дисциплину</button>
+                <button type="submit" class="btn btn-primary px-4 fw-bold w-100">
+                    {% if edit_mode %}Сохранить изменения{% else %}Создать дисциплину{% endif %}
+                </button>
             </form>
         </div>
     </div>

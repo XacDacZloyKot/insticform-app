@@ -1,0 +1,57 @@
+{% extends "base/base.html" %}
+{% block title %}Профиль пользователя{% endblock %}
+{% block header_title %}Карточка пользователя{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6 col-lg-5">
+            <div class="card card-custom p-4 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-primary m-0">Информация</h4>
+                    <div class="d-flex gap-3">
+                        <a href="/users/{{ target_user.id }}/edit"
+                           class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить"
+                                 style="width: 18px;">
+                            Изменить
+                        </a>
+                        <form action="/users/{{ target_user.id }}/delete" method="post"
+                              onsubmit="return confirm('Вы уверены, что хотите удалить этого пользователя?');"
+                              class="m-0">
+                            <button type="submit"
+                                    class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить"
+                                     style="width: 18px;">
+                                Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <table class="table table-borderless">
+                    <tbody>
+                    <tr>
+                        <td class="text-muted" style="width: 120px;">ID:</td>
+                        <td class="fw-bold">#{{ target_user.id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">ФИО:</td>
+                        <td class="fw-bold">{{ target_user.last_name }} {{ target_user.first_name }}
+                            {% if target_user.patronymic %}{{ target_user.patronymic }}{% endif %}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Логин:</td>
+                        <td><code>{{ target_user.username }}</code></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Роль:</td>
+                        <td><span class="badge bg-secondary">{{ target_user.role.value | upper }}</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <a href="/users" class="btn btn-outline-secondary mt-3 w-100 fw-bold">Вернуться к списку</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

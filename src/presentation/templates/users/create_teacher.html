@@ -1,0 +1,64 @@
+{% extends "base/base.html" %}
+
+{% block title %}Создание преподавателя{% endblock %}
+{% block header_title %}Управление пользователями{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 col-lg-6">
+            <div class="card card-custom p-4 shadow-sm border-0">
+                <h4 class="fw-bold text-primary mb-4">
+                    <img src="{{ url_for('static', path='/img/Users.svg') }}" alt="Пользователи"
+                         style="width: 28px; opacity: 0.8;" class="me-2">
+                    {% if edit_mode %}Редактирование пользователя{% else %}Новый преподаватель{% endif %}
+                </h4>
+
+                {% if success %}
+                    <div class="alert alert-success py-2">Успешно!</div>{% endif %}
+                {% if error %}
+                    <div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+
+                <form action="{% if edit_mode %}/users/{{ target_user.id }}/edit{% else %}/users/create/teacher{% endif %}"
+                      method="post">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Логин системы</label>
+                        <input type="text" class="form-control" name="username"
+                               value="{{ target_user.username if edit_mode else '' }}" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-secondary">Фамилия</label>
+                            <input type="text" class="form-control" name="last_name"
+                                   value="{{ target_user.last_name if edit_mode else '' }}" required>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label class="form-label fw-bold small text-secondary">Имя</label>
+                            <input type="text" class="form-control" name="first_name"
+                                   value="{{ target_user.first_name if edit_mode else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-secondary">Отчество <span
+                                class="text-muted fw-normal small">(необязательно)</span></label>
+                        <input type="text" class="form-control" name="patronymic"
+                               value="{{ target_user.patronymic if edit_mode and target_user.patronymic else '' }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-secondary">{% if edit_mode %}Новый пароль{% else %}
+                            Временный пароль{% endif %}</label>
+                        <input type="password" class="form-control" name="password"
+                               placeholder="{% if edit_mode %}Оставьте пустым, чтобы не менять{% else %}Минимум 6 символов{% endif %}"
+                               minlength="6" {% if not edit_mode %}required{% endif %}>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                        {% if edit_mode %}Сохранить изменения{% else %}Зарегистрировать преподавателя{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
