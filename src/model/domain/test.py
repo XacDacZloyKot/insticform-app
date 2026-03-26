@@ -24,6 +24,8 @@ class Test(Base):
     questions_to_show: Mapped[Optional[int]] = mapped_column(Integer)
     grading_method: Mapped[GradingMethod] = mapped_column(Enum(GradingMethod), default=GradingMethod.AUTO)
 
+    media_files: Mapped[List["TestMedia"]] = relationship(back_populates="test", cascade="all, delete-orphan")
+
     discipline: Mapped["Discipline"] = relationship(back_populates="tests")
     creator: Mapped[Optional["User"]] = relationship()
     questions: Mapped[List["Question"]] = relationship(back_populates="test", cascade="all, delete-orphan")
@@ -59,3 +61,16 @@ class AnswerOption(Base):
     score_weight: Mapped[float] = mapped_column(Float, default=1.0)
 
     question: Mapped["Question"] = relationship(back_populates="options")
+
+
+class TestMedia(Base):
+    """Медиафайлы, прикрепленные к тесту."""
+    __tablename__ = "test_media"
+
+    test_id: Mapped[int] = mapped_column(ForeignKey("tests.id", ondelete="CASCADE"))
+
+    file_path: Mapped[str] = mapped_column(String(255), doc="Относительный путь к файлу")
+    media_type: Mapped[MediaType] = mapped_column(Enum(MediaType), doc="Тип медиа (image, video, audio)")
+    original_filename: Mapped[str] = mapped_column(String(255), doc="Оригинальное имя файла")
+
+    test: Mapped["Test"] = relationship(back_populates="media_files")

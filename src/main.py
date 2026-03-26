@@ -1,26 +1,24 @@
 import logging
 import os
-import sys
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import JSONResponse, RedirectResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
+from starlette.responses import JSONResponse, RedirectResponse
 
-from src.core.settings import settings
 from src.core.log_config import setup_logging
+from src.core.settings import settings
 from src.core.templates import templates
-
+from src.presentation.routes.academic import router as academic_router
 from src.presentation.routes.auth import router as auth_router
 from src.presentation.routes.home import router as home_router
+from src.presentation.routes.tests import router as tests_router
 from src.presentation.routes.users import router as users_router
-from src.presentation.routes.academic import router as academic_router
-
 
 setup_logging()
 logger = logging.getLogger("InsticForm")
@@ -57,6 +55,7 @@ app.include_router(auth_router)
 app.include_router(home_router)
 app.include_router(users_router)
 app.include_router(academic_router)
+app.include_router(tests_router)
 
 
 @app.exception_handler(RequestValidationError)
