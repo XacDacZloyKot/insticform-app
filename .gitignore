@@ -210,6 +210,6 @@ __marimo__/
 /src/db/insticform.db
 /directory-tree.txt
 
-.src/static/media/images/*
-.src/static/media/videos/*
-.src/static/media/audios/*
+src/static/media/images/*
+src/static/media/videos/*
+src/static/media/audios/*
