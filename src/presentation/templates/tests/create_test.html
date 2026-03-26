@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+{% block title %}Создание нового теста{% endblock %}
+{% block header_title %}Банк тестов{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="card card-custom p-4 shadow-sm border-0">
+            <h4 class="fw-bold text-primary mb-4">
+                <img src="{{ url_for('static', path='/img/Tests.svg') }}" style="width: 24px;" class="me-2"> 
+                Настройки нового теста
+            </h4>
+
+            <form action="/tests/create" method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Название теста</label>
+                    <input type="text" class="form-control" name="title" placeholder="Например: Итоговый контроль по Матанализу" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Привязка к дисциплине</label>
+                    <select class="form-select" name="discipline_id" required>
+                        <option value="" disabled selected>Выберите дисциплину...</option>
+                        {% for d in disciplines %}
+                            <option value="{{ d.id }}">{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold small text-secondary">Описание / Инструкция для студентов</label>
+                    <textarea class="form-control" name="description" rows="3" placeholder="Краткие правила прохождения..."></textarea>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small text-secondary">Лимит времени (минуты)</label>
+                        <input type="number" class="form-control" name="time_limit_minutes" placeholder="Оставьте пустым для безлимита" min="1">
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0 d-flex align-items-end pb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="shuffle_questions" value="true" id="shuffleCheck">
+                            <label class="form-check-label small fw-bold text-secondary" for="shuffleCheck">Перемешивать вопросы</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+                    Создать и перейти к вопросам ➔
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
