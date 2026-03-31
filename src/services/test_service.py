@@ -26,30 +26,6 @@ class TestService:
         new_test = Test(**test_data)
         return await self.test_repo.create(new_test)
 
-    async def create_question_with_options(self, test_id: int, question_data: QuestionCreate) -> Question:
-        # Создаем сам вопрос
-        new_question = Question(
-            test_id=test_id,
-            text=question_data.text,
-            type=question_data.type,
-            media_url=question_data.media_url,
-            allow_partial_credit=question_data.allow_partial_credit,
-            time_limit_seconds=question_data.time_limit_seconds
-        )
-        created_question = await self.question_repo.create(new_question)
-
-        # Сохраняем варианты ответов
-        for opt in question_data.options:
-            new_option = AnswerOption(
-                question_id=created_question.id,
-                text=opt.text,
-                is_correct=opt.is_correct,
-                score_weight=opt.score_weight
-            )
-            await self.option_repo.create(new_option)
-
-        return created_question
-
     async def attach_media_to_test(self, test_id: int, file: UploadFile) -> TestMedia:
         # Сохраняем файлы на комп
         relative_path, media_type = await save_upload_file(file)
@@ -74,7 +50,8 @@ class TestService:
             selectinload(Test.discipline),
             selectinload(Test.creator),
             selectinload(Test.questions).selectinload(Question.options),
-            selectinload(Test.media_files)
+            selectinload(Test.media_files),
+            selectinload(Test.assigned_students)
         ]
         return await self.test_repo.get_one_with_joins(id=test_id, joins=joins)
 
@@ -147,8 +124,18 @@ class TestService:
         """Удаляет только медиафайл у вопроса, оставляя сам вопрос."""
         question = await self.question_repo.get_one(id=question_id)
         if question.media_url:
+            # Удаляем физически с диска
             delete_physical_file(question.media_url)
-            # Очищаем пути в БД
-            question.media_url = None
-            question.media_type = None
-            await self.question_repo.session.commit()
+            await self.question_repo.remove_media(question)
+
+    async def assign_students(self, test_id: int, students: list) -> None:
+        """Массово назначает тест списку студентов (игнорируя дубликаты)."""
+        test = await self.get_test_by_id(test_id)
+        await self.test_repo.assign_students(test, students)
+
+    async def unassign_student(self, test_id: int, student_id: int) -> None:
+        """Снимает назначение теста с конкретного студента."""
+        test = await self.get_test_by_id(test_id)
+        student_to_remove = next((s for s in test.assigned_students if s.id == student_id), None)
+        if student_to_remove:
+            await self.test_repo.unassign_student(test, student_to_remove)
