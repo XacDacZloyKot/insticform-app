@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request, status
 from fastapi import Form
 from starlette.responses import HTMLResponse, RedirectResponse
 
-from core.utils.auth.access_rights import get_current_teacher
+from src.core.utils.auth.access_rights import get_current_teacher
 from src.core.dependencies import get_academic_service
 from src.core.dependencies import get_test_service
 from src.core.dependencies import get_user_service
