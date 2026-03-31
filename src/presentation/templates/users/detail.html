@@ -4,8 +4,8 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-6 col-lg-5">
-            <div class="card card-custom p-4 shadow-sm border-0">
+        <div class="col-md-6 col-lg-5 mb-4">
+            <div class="card card-custom p-4 shadow-sm border-0 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold text-primary m-0">Информация</h4>
                     <div class="d-flex gap-3">
@@ -50,8 +50,51 @@
                     </tbody>
                 </table>
 
-                <a href="/users" class="btn btn-outline-secondary mt-3 w-100 fw-bold">Вернуться к списку</a>
+                <a href="/users" class="btn btn-outline-secondary mt-auto w-100 fw-bold">Вернуться к списку</a>
             </div>
         </div>
+
+        {% if target_user.role.value == 'student' %}
+        <div class="col-md-6 col-lg-7 mb-4">
+            <div class="card card-custom p-4 shadow-sm border-0 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-primary m-0">Назначенные тесты</h5>
+                    <span class="badge bg-light text-dark border">{{ target_user.assigned_tests|length }} шт.</span>
+                </div>
+
+                <form action="/users/{{ target_user.id }}/assign_test" method="post" class="d-flex gap-2 mb-4 p-3 bg-light rounded border border-primary border-opacity-25">
+                    <select name="test_id" class="form-select border-secondary shadow-sm" required>
+                        <option value="" disabled selected>Выберите тест из банка...</option>
+                        {% for t in available_tests %}
+                            <option value="{{ t.id }}">{{ t.title }} ({{ t.discipline.name if t.discipline else 'Без дисциплины' }})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 text-nowrap shadow-sm">Выдать</button>
+                </form>
+
+                <div class="list-group list-group-flush border rounded shadow-sm">
+                    {% for test in target_user.assigned_tests %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center bg-white p-3">
+                            <div>
+                                <h6 class="mb-1 fw-bold">{{ test.title }}</h6>
+                                <small class="text-muted">
+                                    {{ test.discipline.name if test.discipline else 'Без дисциплины' }} •
+                                    <i class="bi bi-clock"></i> {{ test.time_limit_minutes ~ ' мин.' if test.time_limit_minutes else 'Без лимита' }}
+                                </small>
+                            </div>
+                            <form action="/users/{{ target_user.id }}/unassign_test/{{ test.id }}" method="post" class="m-0" onsubmit="return confirm('Забрать доступ к этому тесту у студента?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0 px-2 fs-5" title="Удалить">✖</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="p-5 text-center text-muted bg-light rounded">
+                            Студенту пока не назначено ни одного теста.<br>
+                            Выберите тест в меню выше и нажмите «Выдать».
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}
