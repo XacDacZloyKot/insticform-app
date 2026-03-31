@@ -1,17 +1,20 @@
 from fastapi import APIRouter, Depends, Request, status
-from starlette.responses import HTMLResponse, RedirectResponse
 from fastapi import Form
-from src.services.user_service import UserService
-from src.core.dependencies import get_user_service
-from src.model.domain.enums import UserRole
+from starlette.responses import HTMLResponse, RedirectResponse
 
+from core.utils.auth.access_rights import get_current_teacher
+from src.core.dependencies import get_academic_service
+from src.core.dependencies import get_test_service
+from src.core.dependencies import get_user_service
 from src.core.templates import templates
 from src.core.utils.auth.access_rights import get_current_admin
+from src.model.domain.enums import UserRole
 from src.model.domain.user import User
-from src.presentation.forms.academic_forms import create_group_form, create_discipline_form
 from src.model.schemas.academic import GroupBase, DisciplineBase
+from src.presentation.forms.academic_forms import create_group_form, create_discipline_form
 from src.services.academic_service import AcademicService
-from src.core.dependencies import get_academic_service
+from src.services.test_service import TestService
+from src.services.user_service import UserService
 
 router = APIRouter(prefix='/academic', tags=['Academic Management'])
 
@@ -52,13 +55,14 @@ async def post_create_group(
 async def group_detail(
         group_id: int, request: Request,
         academic_service: AcademicService = Depends(get_academic_service),
+        test_service: TestService = Depends(get_test_service),
         user_service: UserService = Depends(get_user_service),
-        current_user: User = Depends(get_current_admin)
+        current_user: User = Depends(get_current_teacher)
 ):
-    # Достаем группу С ЕЁ студентами
     group = await academic_service.get_group_with_relations(group_id)
-    # Достаем ВСЕХ студентов системы
     all_students = await user_service.list(role=UserRole.STUDENT)
+
+    available_tests = await test_service.list_tests()
 
     # Отфильтровываем тех, кто УЖЕ в этой группе, чтобы не предлагать их добавить дважды
     existing_student_ids = [s.id for s in group.students]
@@ -66,6 +70,7 @@ async def group_detail(
 
     return templates.TemplateResponse("academic/group_detail.html", {
         "request": request, "user": current_user, "group": group,
+        "available_tests": available_tests,
         "available_students": available_students
     })
 
@@ -180,42 +185,75 @@ async def delete_discipline(discipline_id: int, academic_service: AcademicServic
     await academic_service.delete_discipline(discipline_id)
     return RedirectResponse(url="/academic/disciplines", status_code=status.HTTP_303_SEE_OTHER)
 
+
 # --- ЭНДПОИНТЫ ДЛЯ РЕДАКТИРОВАНИЯ ГРУППЫ ---
 
 @router.get("/groups/{group_id}/edit", response_class=HTMLResponse)
-async def get_edit_group_page(group_id: int, request: Request, academic_service: AcademicService = Depends(get_academic_service), current_user: User = Depends(get_current_admin)):
+async def get_edit_group_page(group_id: int, request: Request,
+                              academic_service: AcademicService = Depends(get_academic_service),
+                              current_user: User = Depends(get_current_admin)):
     group = await academic_service.get_group_by_id(group_id)
     # Используем тот же шаблон create_group.html, но передаем флаг edit_mode=True и саму группу
-    return templates.TemplateResponse("academic/create_group.html", {"request": request, "user": current_user, "group": group, "edit_mode": True})
+    return templates.TemplateResponse("academic/create_group.html",
+                                      {"request": request, "user": current_user, "group": group, "edit_mode": True})
+
 
 @router.post("/groups/{group_id}/edit", response_class=HTMLResponse)
 async def post_edit_group(
-    group_id: int, request: Request, form_data: GroupBase = Depends(create_group_form),
-    academic_service: AcademicService = Depends(get_academic_service), current_user: User = Depends(get_current_admin)
+        group_id: int, request: Request, form_data: GroupBase = Depends(create_group_form),
+        academic_service: AcademicService = Depends(get_academic_service),
+        current_user: User = Depends(get_current_admin)
 ):
     try:
         await academic_service.update_group(group_id, form_data)
         return RedirectResponse(url=f"/academic/groups/{group_id}", status_code=status.HTTP_303_SEE_OTHER)
     except ValueError as e:
         group = await academic_service.get_group_by_id(group_id)
-        return templates.TemplateResponse("academic/create_group.html", {"request": request, "user": current_user, "group": group, "edit_mode": True, "error": str(e)})
+        return templates.TemplateResponse("academic/create_group.html",
+                                          {"request": request, "user": current_user, "group": group, "edit_mode": True,
+                                           "error": str(e)})
 
 
 # --- ЭНДПОИНТЫ ДЛЯ РЕДАКТИРОВАНИЯ ДИСЦИПЛИНЫ ---
 
 @router.get("/disciplines/{discipline_id}/edit", response_class=HTMLResponse)
-async def get_edit_discipline_page(discipline_id: int, request: Request, academic_service: AcademicService = Depends(get_academic_service), current_user: User = Depends(get_current_admin)):
+async def get_edit_discipline_page(discipline_id: int, request: Request,
+                                   academic_service: AcademicService = Depends(get_academic_service),
+                                   current_user: User = Depends(get_current_admin)):
     discipline = await academic_service.get_discipline_by_id(discipline_id)
-    return templates.TemplateResponse("academic/create_discipline.html", {"request": request, "user": current_user, "discipline": discipline, "edit_mode": True})
+    return templates.TemplateResponse("academic/create_discipline.html",
+                                      {"request": request, "user": current_user, "discipline": discipline,
+                                       "edit_mode": True})
+
 
 @router.post("/disciplines/{discipline_id}/edit", response_class=HTMLResponse)
 async def post_edit_discipline(
-    discipline_id: int, request: Request, form_data: DisciplineBase = Depends(create_discipline_form),
-    academic_service: AcademicService = Depends(get_academic_service), current_user: User = Depends(get_current_admin)
+        discipline_id: int, request: Request, form_data: DisciplineBase = Depends(create_discipline_form),
+        academic_service: AcademicService = Depends(get_academic_service),
+        current_user: User = Depends(get_current_admin)
 ):
     try:
         await academic_service.update_discipline(discipline_id, form_data)
         return RedirectResponse(url=f"/academic/disciplines/{discipline_id}", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         discipline = await academic_service.get_discipline_by_id(discipline_id)
-        return templates.TemplateResponse("academic/create_discipline.html", {"request": request, "user": current_user, "discipline": discipline, "edit_mode": True, "error": str(e)})
+        return templates.TemplateResponse("academic/create_discipline.html",
+                                          {"request": request, "user": current_user, "discipline": discipline,
+                                           "edit_mode": True, "error": str(e)})
+
+
+@router.post("/groups/{group_id}/assign_test")
+async def assign_test_to_group_from_group_page(
+        group_id: int,
+        test_id: int = Form(...),
+        academic_service: AcademicService = Depends(get_academic_service),
+        test_service: TestService = Depends(get_test_service),
+        current_user: User = Depends(get_current_teacher)
+):
+    # Получаем группу со студентами
+    group = await academic_service.get_group_with_relations(group_id)
+
+    # Выдаем тест всем студентам этой группы (наша плоская логика!)
+    await test_service.assign_students(test_id, group.students)
+
+    return RedirectResponse(url=f"/academic/groups/{group_id}", status_code=status.HTTP_303_SEE_OTHER)
