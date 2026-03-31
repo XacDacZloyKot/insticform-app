@@ -1,5 +1,6 @@
 from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import String, Text, ForeignKey, Boolean, Float, Enum, Integer
+
+from sqlalchemy import String, Text, ForeignKey, Boolean, Float, Enum, Table, Column, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.model.domain.base import Base
@@ -7,6 +8,13 @@ from src.model.domain.enums import GradingMethod, QuestionType, MediaType
 
 if TYPE_CHECKING:
     from src.model.domain import Discipline, TestAttempt, User
+
+test_student_association = Table(
+    "test_student_association",
+    Base.metadata,
+    Column("test_id", Integer, ForeignKey("tests.id", ondelete="CASCADE"), primary_key=True),
+    Column("student_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+)
 
 
 class Test(Base):
@@ -23,6 +31,9 @@ class Test(Base):
     shuffle_questions: Mapped[bool] = mapped_column(Boolean, default=False)
     questions_to_show: Mapped[Optional[int]] = mapped_column(Integer)
     grading_method: Mapped[GradingMethod] = mapped_column(Enum(GradingMethod), default=GradingMethod.AUTO)
+
+    assigned_students: Mapped[List["User"]] = relationship("User", secondary=test_student_association,
+                                                           backref="assigned_tests")
 
     media_files: Mapped[List["TestMedia"]] = relationship(back_populates="test", cascade="all, delete-orphan")
 

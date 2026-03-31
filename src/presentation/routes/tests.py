@@ -160,3 +160,14 @@ async def delete_question_media(test_id: int, question_id: int, test_service: Te
                                 current_user: User = Depends(get_current_user)):
     await test_service.delete_question_media(question_id)
     return RedirectResponse(url=f"/tests/{test_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/{test_id}/unassign/{student_id}")
+async def unassign_test_from_student(
+        test_id: int,
+        student_id: int,
+        test_service: TestService = Depends(get_test_service),
+        current_user: User = Depends(get_current_user)
+):
+    await test_service.unassign_student(test_id, student_id)
+    return RedirectResponse(url=f"/tests/{test_id}", status_code=status.HTTP_303_SEE_OTHER)
