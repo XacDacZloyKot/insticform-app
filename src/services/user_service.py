@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 
 from src.core.utils.auth import tokens
 from src.core.utils.auth.password import verify_password
+from src.model.domain import Test
 from src.model.domain.user import User
 from src.model.schemas.user import UserCreate
 from src.repositories.user_repository import UserRepository
@@ -130,3 +131,13 @@ class UserService:
             update_data.pop("password", None)
 
         return await self.user_repository.update(id=user_id, data=update_data)
+
+    async def get_user_with_relations(self, user_id: int) -> User:
+        """Получение информации о пользователе вместе с назначенными тестами."""
+        try:
+            # Подгружаем назначенные тесты и сразу их дисциплины
+            joins = [selectinload(User.assigned_tests).selectinload(Test.discipline)]
+            return await self.user_repository.get_one_with_joins(id=user_id, joins=joins)
+        except Exception:
+            logger.warning(f"Запрос несуществующего пользователя: ID {user_id}")
+            raise ValueError(f"Пользователь с ID {user_id} не найден")
