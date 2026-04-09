@@ -1,8 +1,254 @@
-{% extends "base/base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>InstiForm | Современное тестирование студентов ИГЭУ</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/pages/landing/landing.css') }}">
 
-{% block title %}Панель администратора{% endblock %}
-{% block header_title %}Администрирование{% endblock %}
+</head>
+<body>
 
-{% block content %}
-    Тут делать лендинг.
-{% endblock %}
+<header class="header">
+    <div class="container">
+        <div class="nav">
+            <div class="logo">
+                <i class="fas fa-chalkboard-user"></i>
+                <span>InstiForm</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Возможности</a>
+                <a href="#howitworks">Как это работает</a>
+                <a href="#about">О проекте</a>
+                <button class="btn-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i> Вернуться назад
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Hero секция с обновлённой информационной панелью (без вымышленных цифр) -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-graduation-cap"></i> Официальная платформа ИГЭУ
+                    </div>
+                    <h1>
+                        Тестируй знания с <span class="hero-highlight">InstiForm</span><br>
+                        для студентов ИГЭУ
+                    </h1>
+                    <p class="hero-description">
+                        Современная экосистема для проведения онлайн-тестирования.
+                        Преподаватели создают задания, студенты проверяют знания —
+                        всё в одном месте.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#features" class="btn-outline" style="padding: 12px 28px; text-decoration: none;">Узнать больше</a>
+                    </div>
+                </div>
+                <!-- Новая информационная панель: ключевые особенности проекта -->
+                <div class="hero-stats">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="fas fa-check-circle" style="font-size: 2rem;"></i></div>
+                            <div class="stat-label">Разработано при поддержке ИГЭУ</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="fas fa-laptop-code" style="font-size: 2rem;"></i></div>
+                            <div class="stat-label">Современные форматы тестов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="fas fa-chart-simple" style="font-size: 2rem;"></i></div>
+                            <div class="stat-label">Автоматическая аналитика</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number"><i class="fas fa-users" style="font-size: 2rem;"></i></div>
+                            <div class="stat-label">Для студентов и преподавателей</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Особенности платформы -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Почему InstiForm — выбор ИГЭУ</h2>
+                <p>Инструменты, созданные для повышения качества образования и удобства работы</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                    <h3>Гибкие тесты</h3>
+                    <p>Создавайте тесты с разными типами вопросов: выбор ответа, эссе, соответствие и многое другое.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Детальная аналитика</h3>
+                    <p>Автоматическая проверка, статистика успеваемости, отчёты для преподавателей и кафедр.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Безопасность</h3>
+                    <p>Надёжная защита данных студентов и результатов тестирования. Прокторинг и контроль.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Доступность везде</h3>
+                    <p>Адаптивный интерфейс для ПК, планшетов и телефонов. Проходите тесты из любой точки.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Как это работает -->
+    <section id="howitworks" class="steps">
+        <div class="container" style="padding: 70px 0;">
+            <div class="section-header">
+                <h2>Как начать пользоваться</h2>
+                <p>Простой и понятный путь для студентов и преподавателей ИГЭУ</p>
+            </div>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Регистрация</h3>
+                    <p>Заполните профиль с помощью корпоративной почты ИГЭУ или студенческого билета.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Доступ к тестам</h3>
+                    <p>Выберите дисциплину, получите индивидуальные задания от преподавателя.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Прохождение</h3>
+                    <p>Выполняйте тесты в удобное время, система фиксирует результат моментально.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Анализ успехов</h3>
+                    <p>Просматривайте оценки, рекомендации и отслеживайте свой прогресс.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Для преподавателей и студентов блок (особенности ролей) -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Создано для сообщества ИГЭУ</h2>
+                <p>Инструменты, которые объединяют студентов и преподавателей</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: center;">
+                <div style="flex: 1; min-width: 260px; background: var(--primary-light); border-radius: 36px; padding: 32px 28px;">
+                    <i class="fas fa-user-graduate" style="font-size: 2.5rem; color: var(--primary-dark); margin-bottom: 20px; display: inline-block;"></i>
+                    <h3 style="margin-bottom: 12px; font-size: 1.6rem;">Студентам</h3>
+                    <ul style="list-style: none; margin-top: 16px;">
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Мгновенная проверка знаний</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Подготовка к экзаменам</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Рейтинги и достижения</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Доступ к пробным тестам</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; min-width: 260px; background: white; border: 1px solid var(--gray-border); border-radius: 36px; padding: 32px 28px; box-shadow: var(--shadow-sm);">
+                    <i class="fas fa-chalkboard" style="font-size: 2.5rem; color: var(--primary-dark); margin-bottom: 20px; display: inline-block;"></i>
+                    <h3 style="margin-bottom: 12px; font-size: 1.6rem;">Преподавателям</h3>
+                    <ul style="list-style: none; margin-top: 16px;">
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Конструктор тестов</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Автоматическая проверка</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Экспорт результатов в Excel/PDF</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Анализ прогресса групп</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; min-width: 260px; background: var(--primary-light); border-radius: 36px; padding: 32px 28px;">
+                    <i class="fas fa-building" style="font-size: 2.5rem; color: var(--primary-dark); margin-bottom: 20px; display: inline-block;"></i>
+                    <h3 style="margin-bottom: 12px; font-size: 1.6rem;">Университету</h3>
+                    <ul style="list-style: none; margin-top: 16px;">
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Единая база тестирования</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Соответствие ФГОС</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 12px;"></i> Мониторинг качества знаний</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Новая информационная секция вместо старого CTA -->
+    <div class="container">
+        <div class="info-block">
+            <h2>InstiForm — это современный подход к обучению</h2>
+            <p>Платформа создана для автоматизации тестирования, повышения объективности оценки знаний и упрощения работы преподавателей. Поддерживается Центром информационных технологий ИГЭУ.</p>
+            <button class="btn-white-back" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> Вернуться назад
+            </button>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo" style="margin-bottom: 12px;">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span>InstiForm</span>
+                </div>
+                <p>Цифровая платформа для онлайн-тестирования студентов Ивановского государственного энергетического университета.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>Продукт</h4>
+                    <a href="#features">Возможности</a>
+                    <a href="#howitworks">Как это работает</a>
+                    <a href="#">Бесплатно для ИГЭУ</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Поддержка</h4>
+                    <a href="#">Помощь</a>
+                    <a href="#">Документация</a>
+                    <a href="#">Служба поддержки</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Правовая информация</h4>
+                    <a href="#">Политика конфиденциальности</a>
+                    <a href="#">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 InstiForm — образовательная платформа для студентов и сотрудников ИГЭУ. Все права защищены.</p>
+            <p style="margin-top: 8px; font-size: 0.8rem;"><i class="fas fa-location-dot"></i> Иваново, ул. Рабфаковская, 34</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Функция возврата на предыдущую страницу
+    function goBack() {
+        window.history.back();
+    }
+
+    // Плавная навигация по якорям
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === "#" || href === "") return;
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+</body>
+</html>
