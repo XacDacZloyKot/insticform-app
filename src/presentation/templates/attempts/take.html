@@ -1,0 +1,144 @@
+{% extends "base/base.html" %}
+{% block title %}Прохождение теста{% endblock %}
+{% block header_title %}{{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-3 shadow-sm border-0 mb-4" id="progressContainer">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span id="progressText" class="fw-bold text-secondary">Вопрос 1 из {{ test.questions|length }}</span>
+                {% if test.time_limit_minutes %}
+                    <span class="badge bg-danger fs-6 d-flex align-items-center gap-2">
+                        <i class="bi bi-stopwatch"></i> <span id="timerDisplay">--:--</span>
+                    </span>
+                {% endif %}
+            </div>
+            <div class="progress" style="height: 10px;">
+                <div id="progressBar" class="progress-bar bg-success" style="width: 0%; transition: width 0.3s;"></div>
+            </div>
+        </div>
+
+        <form id="testForm" action="/attempts/{{ attempt.id }}/submit" method="post">
+            {% for question in test.questions %}
+            <div class="card card-custom p-4 shadow-sm border-0 mb-4 question-block" id="qBlock_{{ loop.index0 }}" style="display: none;">
+                <h5 class="fw-bold mb-3">{{ question.text }}</h5>
+
+                {% if question.media_url %}
+                    <div class="mb-4 bg-light p-2 rounded text-center">
+                        {% if question.media_type.name == 'IMAGE' %}
+                            <img src="/static/media{{ question.media_url }}" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                        {% elif question.media_type.name == 'VIDEO' %}
+                            <video controls class="rounded shadow-sm" style="max-height: 300px; max-width: 100%;"><source src="/static/media{{ question.media_url }}" type="video/mp4"></video>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="list-group list-group-flush">
+                    {% for opt in question.options %}
+                    <label class="list-group-item d-flex align-items-center bg-white border rounded mb-2 py-3 shadow-sm" style="cursor: pointer;">
+                        {% if question.type.value == 'multiple_choice' %}
+                            <input class="form-check-input me-3" type="checkbox" name="q_{{ question.id }}" value="{{ opt.id }}">
+                        {% else %}
+                            <input class="form-check-input me-3" type="radio" name="q_{{ question.id }}" value="{{ opt.id }}">
+                        {% endif %}
+                        <span>{{ opt.text }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" id="prevBtn" class="btn btn-outline-secondary fw-bold px-4" disabled>← Назад</button>
+                <button type="button" id="nextBtn" class="btn btn-primary fw-bold px-4">Вперед →</button>
+                <button type="submit" id="submitBtn" class="btn btn-success fw-bold px-5" style="display: none;">Завершить тест</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const questions = document.querySelectorAll('.question-block');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    let currentIndex = 0;
+
+    // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВОПРОСОВ ---
+    function showQuestion(index) {
+        questions.forEach((q, i) => q.style.display = (i === index) ? 'block' : 'none');
+        prevBtn.disabled = index === 0;
+        
+        if (index === questions.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+        
+        const percent = ((index + 1) / questions.length) * 100;
+        progressBar.style.width = percent + '%';
+        progressText.innerText = `Вопрос ${index + 1} из ${questions.length}`;
+        const contentArea = document.querySelector('.content');
+        if (contentArea) {
+            contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    prevBtn.onclick = () => { if (currentIndex > 0) showQuestion(--currentIndex); };
+    nextBtn.onclick = () => { if (currentIndex < questions.length - 1) showQuestion(++currentIndex); };
+    
+    if (questions.length > 0) showQuestion(0);
+
+    // --- ЛОГИКА ПРОКТОРИНГА ---
+    const attemptId = {{ attempt.id }};
+    function logProctoring(action, details) {
+        fetch(`/attempts/${attemptId}/proctoring`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ action_type: action, details: details })
+        }).catch(err => console.error("Proctoring log failed", err));
+    }
+
+    // 1. Переключение вкладок
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) logProctoring('tab_switch', 'Пользователь свернул вкладку или свернул браузер');
+    });
+    // 2. Попытка скопировать или вставить текст
+    document.addEventListener('copy', (e) => {
+        logProctoring('copy_paste', 'Попытка копирования текста');
+        e.preventDefault(); // Запрещаем копировать
+    });
+    document.addEventListener('paste', () => logProctoring('copy_paste', 'Попытка вставки текста'));
+    // 3. Выход мыши за пределы окна
+    document.addEventListener('mouseleave', () => logProctoring('mouse_leave', 'Курсор покинул окно браузера'));
+    // 4. Потеря интернета
+    window.addEventListener('offline', () => logProctoring('connection_lost', 'Потеряно соединение с интернетом'));
+
+    // --- ТАЙМЕР ---
+    {% if test.time_limit_minutes %}
+    let timeLeft = {{ test.time_limit_minutes * 60 }};
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    const timer = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            alert("Время вышло! Ваши ответы будут сохранены автоматически.");
+            document.getElementById('testForm').submit();
+        } else {
+            timeLeft--;
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerDisplay.innerText = `${m}:${s}`;
+            if (timeLeft < 60) timerDisplay.parentElement.classList.add('animate-pulse'); // Мигание на последней минуте
+        }
+    }, 1000);
+    {% endif %}
+</script>
+{% endblock %}
