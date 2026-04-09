@@ -4,6 +4,7 @@ from fastapi import UploadFile
 from sqlalchemy.orm import selectinload
 
 from src.core.utils.file_helper import save_upload_file, delete_physical_file
+from src.model.domain.attempt import TestAttempt
 from src.model.domain.test import Question, AnswerOption, Test, TestMedia
 from src.model.schemas.test import QuestionCreate
 from src.repositories.test_repository import TestRepository, TestMediaRepository, QuestionRepository, \
@@ -51,7 +52,8 @@ class TestService:
             selectinload(Test.creator),
             selectinload(Test.questions).selectinload(Question.options),
             selectinload(Test.media_files),
-            selectinload(Test.assigned_students)
+            selectinload(Test.assigned_students),
+            selectinload(Test.attempts).selectinload(TestAttempt.student)
         ]
         return await self.test_repo.get_one_with_joins(id=test_id, joins=joins)
 

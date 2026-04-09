@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from src.core.utils.auth import tokens
 from src.core.utils.auth.password import verify_password
 from src.model.domain import Test
+from src.model.domain.attempt import TestAttempt
 from src.model.domain.user import User
 from src.model.schemas.user import UserCreate
 from src.repositories.user_repository import UserRepository
@@ -136,7 +137,10 @@ class UserService:
         """Получение информации о пользователе вместе с назначенными тестами."""
         try:
             # Подгружаем назначенные тесты и сразу их дисциплины
-            joins = [selectinload(User.assigned_tests).selectinload(Test.discipline)]
+            joins = [
+                selectinload(User.assigned_tests).selectinload(Test.discipline),
+                selectinload(User.test_attempts).selectinload(TestAttempt.test).selectinload(Test.discipline)
+            ]
             return await self.user_repository.get_one_with_joins(id=user_id, joins=joins)
         except Exception:
             logger.warning(f"Запрос несуществующего пользователя: ID {user_id}")
