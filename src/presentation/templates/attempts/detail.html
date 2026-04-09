@@ -1,0 +1,128 @@
+{% extends "base/base.html" %}
+{% block title %}Детали попытки #{{ attempt.id }}{% endblock %}
+{% block header_title %}Результаты тестирования{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card card-custom shadow-sm border-0 mb-4 p-4">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <h5 class="fw-bold text-primary m-0">Сводка</h5>
+                <form action="/attempts/{{ attempt.id }}/delete" method="post" class="m-0" onsubmit="return confirm('Вы уверены, что хотите полностью удалить эту попытку? Это действие необратимо, и тест полностью исчезнет из истории студента.');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить попытку целиком">
+                        Удалить
+                        <img src="{{ url_for('static', path='/img/delete.svg') }}" style="width: 14px;">
+                    </button>
+                </form>
+            </div>
+            <p class="mb-1 text-muted small">Студент:</p>
+            <p class="fw-bold mb-3">{{ attempt.student.last_name }} {{ attempt.student.first_name }} ({{ attempt.student.username }})</p>
+            
+            <p class="mb-1 text-muted small">Тест:</p>
+            <p class="fw-bold mb-3">{{ attempt.test.title }}</p>
+
+            <p class="mb-1 text-muted small">Статус и Балл:</p>
+            <p class="mb-3">
+                {% if attempt.status.name == 'COMPLETED' %}
+                    <span class="badge bg-success">Завершен</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">{{ attempt.status.value }}</span>
+                {% endif %}
+                <span class="ms-2 fw-bold text-primary fs-5">
+                    {{ attempt.total_score|round(2) if attempt.total_score is not none else 'Не проверено' }}
+                </span>
+            </p>
+        </div>
+
+        <div class="card card-custom shadow-sm border-0 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fw-bold text-danger m-0">Прокторинг</h5>
+                    <span class="badge bg-danger">{{ proctoring_logs|length }} событий</span>
+                </div>
+
+                {% if proctoring_logs %}
+                <form action="/attempts/{{ attempt.id }}/proctoring/clear" method="post" class="m-0" onsubmit="return confirm('Очистить все записи прокторинга для этой попытки?');">
+                    <button type="submit" class="btn btn-sm btn-light border text-secondary shadow-sm" title="Очистить логи">
+                        Очистить
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            
+            {% if proctoring_logs %}
+            <div class="list-group list-group-flush small border-top pt-2" style="max-height: 400px; overflow-y: auto;">
+                {% for log in proctoring_logs %}
+                <div class="list-group-item px-0 py-2">
+                    <div class="d-flex justify-content-between w-100">
+                        <strong class="text-dark">{{ log.action_type.value }}</strong>
+                        <span class="text-muted" style="font-size: 0.75rem;">{{ log.timestamp.strftime('%H:%M:%S') }}</span>
+                    </div>
+                    <span class="text-muted">{{ log.details }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-success small mb-0"><i class="bi bi-shield-check"></i> Нарушений не зафиксировано. Идеальное прохождение!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card card-custom shadow-sm border-0 p-4">
+            <h5 class="fw-bold text-primary mb-4">Ответы на вопросы ({{ attempt.test.questions|length }})</h5>
+            
+            {% for question in attempt.test.questions %}
+                {% set s_answer = namespace(data=none) %}
+                {% for ans in attempt.student_answers %}
+                    {% if ans.question_id == question.id %}
+                        {% set s_answer.data = ans %}
+                    {% endif %}
+                {% endfor %}
+
+                <div class="mb-4 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between">
+                        <p class="fw-bold mb-2">{{ loop.index }}. {{ question.text }}</p>
+                        <span class="badge bg-light text-dark border h-100">
+                            Балл: {{ s_answer.data.awarded_score if s_answer.data and s_answer.data.awarded_score is not none else '—' }}
+                        </span>
+                    </div>
+                    
+                    {% if question.type.value == 'text_answer' %}
+                        <div class="p-3 bg-light rounded mt-2 border border-secondary border-opacity-25">
+                            <span class="text-muted small d-block mb-1">Ответ студента:</span>
+                            {{ s_answer.data.text_answer if s_answer.data and s_answer.data.text_answer else '<span class="fst-italic text-danger">Нет ответа</span>'|safe }}
+                        </div>
+                    {% else %}
+                        <ul class="list-group mt-2">
+                            {% for opt in question.options %}
+                                {% set is_selected = false %}
+                                {% if s_answer.data %}
+                                    {% for sel_opt in s_answer.data.selected_options %}
+                                        {% if sel_opt.id == opt.id %}{% set is_selected = true %}{% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% set bg_class = '' %}
+                                {% if opt.is_correct and is_selected %}
+                                    {% set bg_class = 'list-group-item-success' %} {% elif not opt.is_correct and is_selected %}
+                                    {% set bg_class = 'list-group-item-danger' %} {% elif opt.is_correct and not is_selected %}
+                                    {% set bg_class = 'list-group-item-warning opacity-75' %} {% endif %}
+
+                                <li class="list-group-item {{ bg_class }} d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if is_selected %}<strong>[✓]</strong>{% else %}[&nbsp;&nbsp;]{% endif %}
+                                        {{ opt.text }}
+                                    </div>
+                                    {% if opt.is_correct %}<span class="badge bg-success rounded-pill">Верный ответ</span>{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <a href="javascript:history.back()" class="btn btn-outline-secondary mt-2">← Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
