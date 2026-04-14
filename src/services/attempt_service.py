@@ -13,7 +13,16 @@ class AttemptService:
         self.proctoring_repo = proctoring_repo
 
     async def start_attempt(self, test_id: int, student_id: int) -> TestAttempt:
-        """Создает новую попытку прохождения (фиксирует время старта)."""
+        """Создает новую попытку прохождения или возвращает существующую незавершенную."""
+        existing_attempt = await self.attempt_repo.find_first(
+            test_id=test_id,
+            student_id=student_id,
+            status=AttemptStatus.IN_PROGRESS
+        )
+
+        if existing_attempt:
+            return existing_attempt
+
         attempt = TestAttempt(test_id=test_id, student_id=student_id, status=AttemptStatus.IN_PROGRESS)
         return await self.attempt_repo.create(attempt)
 
