@@ -67,13 +67,15 @@
     const submitBtn = document.getElementById('submitBtn');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
+    const testForm = document.getElementById('testForm');
+    const attemptId = {{ attempt.id }};
     let currentIndex = 0;
 
     // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВОПРОСОВ ---
     function showQuestion(index) {
         questions.forEach((q, i) => q.style.display = (i === index) ? 'block' : 'none');
         prevBtn.disabled = index === 0;
-        
+
         if (index === questions.length - 1) {
             nextBtn.style.display = 'none';
             submitBtn.style.display = 'block';
@@ -81,7 +83,7 @@
             nextBtn.style.display = 'block';
             submitBtn.style.display = 'none';
         }
-        
+
         const percent = ((index + 1) / questions.length) * 100;
         progressBar.style.width = percent + '%';
         progressText.innerText = `Вопрос ${index + 1} из ${questions.length}`;
@@ -93,11 +95,36 @@
 
     prevBtn.onclick = () => { if (currentIndex > 0) showQuestion(--currentIndex); };
     nextBtn.onclick = () => { if (currentIndex < questions.length - 1) showQuestion(++currentIndex); };
-    
+
     if (questions.length > 0) showQuestion(0);
 
+    const formInputs = document.querySelectorAll('#testForm input');
+    const savedData = JSON.parse(localStorage.getItem(`attempt_${attemptId}`) || '{}');
+
+    formInputs.forEach(input => {
+        // Восстанавливаем галочки
+        if ((input.type === 'radio' || input.type === 'checkbox') && savedData[input.name] && savedData[input.name].includes(input.value)) {
+            input.checked = true;
+        }
+        // Слушаем клики и сохраняем
+        input.addEventListener('change', () => {
+            const data = {};
+            formInputs.forEach(inp => {
+                if ((inp.type === 'radio' || inp.type === 'checkbox') && inp.checked) {
+                    if (!data[inp.name]) data[inp.name] = [];
+                    data[inp.name].push(inp.value);
+                }
+            });
+            localStorage.setItem(`attempt_${attemptId}`, JSON.stringify(data));
+        });
+    });
+
+    // Очищаем память браузера после успешной сдачи
+    testForm.addEventListener('submit', () => {
+        localStorage.removeItem(`attempt_${attemptId}`);
+    });
+
     // --- ЛОГИКА ПРОКТОРИНГА ---
-    const attemptId = {{ attempt.id }};
     function logProctoring(action, details) {
         fetch(`/attempts/${attemptId}/proctoring`, {
             method: 'POST',
@@ -106,39 +133,40 @@
         }).catch(err => console.error("Proctoring log failed", err));
     }
 
-    // 1. Переключение вкладок
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) logProctoring('tab_switch', 'Пользователь свернул вкладку или свернул браузер');
     });
-    // 2. Попытка скопировать или вставить текст
     document.addEventListener('copy', (e) => {
         logProctoring('copy_paste', 'Попытка копирования текста');
-        e.preventDefault(); // Запрещаем копировать
+        e.preventDefault();
     });
     document.addEventListener('paste', () => logProctoring('copy_paste', 'Попытка вставки текста'));
-    // 3. Выход мыши за пределы окна
     document.addEventListener('mouseleave', () => logProctoring('mouse_leave', 'Курсор покинул окно браузера'));
-    // 4. Потеря интернета
     window.addEventListener('offline', () => logProctoring('connection_lost', 'Потеряно соединение с интернетом'));
 
-    // --- ТАЙМЕР ---
-    {% if test.time_limit_minutes %}
-    let timeLeft = {{ test.time_limit_minutes * 60 }};
+    {% if time_left_seconds is not none %}
+    let timeLeft = {{ time_left_seconds }};
     const timerDisplay = document.getElementById('timerDisplay');
-    
-    const timer = setInterval(() => {
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            alert("Время вышло! Ваши ответы будут сохранены автоматически.");
-            document.getElementById('testForm').submit();
-        } else {
-            timeLeft--;
-            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const s = (timeLeft % 60).toString().padStart(2, '0');
-            timerDisplay.innerText = `${m}:${s}`;
-            if (timeLeft < 60) timerDisplay.parentElement.classList.add('animate-pulse'); // Мигание на последней минуте
-        }
-    }, 1000);
+
+    // Если студент зашел, а время уже вышло
+    if (timeLeft <= 0) {
+        alert("Время на выполнение теста истекло! Ваши ответы будут сохранены автоматически.");
+        testForm.submit();
+    } else {
+        const timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                alert("Время вышло! Ваши ответы будут сохранены автоматически.");
+                testForm.submit();
+            } else {
+                timeLeft--;
+                const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const s = (timeLeft % 60).toString().padStart(2, '0');
+                timerDisplay.innerText = `${m}:${s}`;
+                if (timeLeft < 60) timerDisplay.parentElement.classList.add('animate-pulse');
+            }
+        }, 1000);
+    }
     {% endif %}
 </script>
 {% endblock %}
