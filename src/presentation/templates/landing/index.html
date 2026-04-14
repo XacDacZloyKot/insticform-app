@@ -26,6 +26,7 @@
             <a href="#features" class="text-decoration-none text-secondary-500 hover-primary">Возможности</a>
             <a href="#howitworks" class="text-decoration-none text-secondary-500 hover-primary">Как это работает</a>
             <a href="#about" class="text-decoration-none text-secondary-500 hover-primary">О проекте</a>
+            <a href="#qa-testing" class="text-decoration-none text-secondary-500 hover-primary"><span class="badge bg-primary bg-opacity-10 text-primary-500 border border-primary border-opacity-25 px-2 py-1">Бета-тест</span></a>
         </nav>
 
         <a href="/auth/login" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 fw-bold px-4 rounded-pill">
@@ -221,6 +222,63 @@
         </div>
     </section>
 
+    <section id="qa-testing" class="py-5 bg-white border-top border-light">
+        <div class="container py-2">
+            <div class="card card-custom border-primary border-opacity-25 shadow-sm overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-4 bg-primary bg-opacity-10 p-5 d-flex flex-column justify-content-center text-center border-end border-primary border-opacity-25">
+                        <img src="{{ url_for('static', path='/img/Redact.svg') }}" style="width: 64px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(200deg);" class="mx-auto mb-3">
+                        <h4 class="fw-bold text-primary-500 mb-2">Памятка для тестировщиков</h4>
+                        <p class="text-secondary-500 small mb-0">Инструкция по локальному развертыванию проекта для проведения ручного тестирования.</p>
+                    </div>
+                    <div class="col-md-8 p-4 p-lg-5">
+                        <h5 class="fw-bold mb-4">Шаги для локального запуска проекта:</h5>
+
+                        <div class="mb-3">
+                            <span class="badge bg-secondary mb-2">Требования: </span>
+                            <div class="bg-dark text-light p-3 rounded-3 font-monospace small" style="overflow-x: auto;">
+                                Python +3.10.*
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge bg-secondary mb-2">1. Получение исходного кода</span>
+                            <div class="bg-dark text-light p-3 rounded-3 font-monospace small" style="overflow-x: auto;">
+                                git clone https://github.com/XacDacZloyKot/insticform-app.git<br>
+                                cd insticform-app;
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge bg-secondary mb-2">2. Виртуальное окружение и зависимости</span>
+                            <div class="bg-dark text-light p-3 rounded-3 font-monospace small" style="overflow-x: auto;">
+                                py -m venv venv<br>
+                                venv\Scripts\activate &nbsp;<span class="text-muted"># Для Windows</span><br>
+                                pip install -r requirements.txt
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="badge bg-secondary mb-2">3. Запуск сервера</span>
+                            <div class="bg-dark text-light p-3 rounded-3 font-monospace small mb-2" style="overflow-x: auto;">
+                                uvicorn src.main:app --reload
+                            </div>
+                            <p class="text-secondary-500 small m-0"><i class="bi bi-info-circle"></i> После успешного запуска приложение будет доступно по адресу: <a href="http://127.0.0.1:8000" target="_blank" class="fw-bold text-primary-500 text-decoration-none">http://127.0.0.1:8000</a></p>
+                        </div>
+
+                        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-0" style="background-color: var(--color-primary-100);">
+                            <img src="{{ url_for('static', path='/img/Info.svg') }}" style="width: 24px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(200deg);">
+                            <div>
+                                <strong class="d-block text-dark">Нашли баг или есть предложения по улучшению?</strong>
+                                <span class="small text-secondary-500">Обратная связь: <a href="https://vk.com/iamfromengland" target="_blank" class="fw-bold text-primary-500 text-decoration-none hover-primary">vk.com/iamfromengland</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="py-5 my-4">
         <div class="container">
             <div class="card border-0 rounded-5 text-white text-center p-5" style="background: linear-gradient(110deg, var(--color-primary-500) 0%, var(--color-primary-400) 100%); box-shadow: 0 20px 40px -10px rgba(37, 99, 235, 0.4);">
@@ -260,6 +318,7 @@
             <div class="col-6 col-lg-2">
                 <h6 class="fw-bold mb-3">Поддержка</h6>
                 <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a href="#qa-testing" class="text-secondary-500 text-decoration-none hover-primary">Для тестировщиков</a></li>
                     <li><a href="#" class="text-secondary-500 text-decoration-none hover-primary">Помощь</a></li>
                     <li><a href="#" class="text-secondary-500 text-decoration-none hover-primary">Документация</a></li>
                 </ul>
