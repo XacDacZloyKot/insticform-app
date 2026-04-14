@@ -5,10 +5,12 @@ from src.db.uow import UnitOfWork
 from src.repositories.academic_repository import GroupRepository, DisciplineRepository
 from src.repositories.test_repository import TestRepository, QuestionRepository, AnswerOptionRepository, \
     TestMediaRepository
+from src.repositories.attempt_repository import AttemptRepository, ProctoringRepository
 from src.repositories.user_repository import UserRepository
 from src.services.academic_service import AcademicService
 from src.services.test_service import TestService
 from src.services.user_service import UserService
+from src.services.attempt_service import AttemptService
 
 
 def get_user_repository(uow: UnitOfWork = Depends(get_uow_dependency)) -> UserRepository:
@@ -60,6 +62,18 @@ def get_test_media_repository(uow: UnitOfWork = Depends(get_uow_dependency)) -> 
     """
     return TestMediaRepository(uow.session)
 
+def get_attempt_repository(uow: UnitOfWork = Depends(get_uow_dependency)) -> AttemptRepository:
+    """
+    Создает репозиторий ответов на вопросы.
+    """
+    return AttemptRepository(uow.session)
+
+def get_proctoring_repository(uow: UnitOfWork = Depends(get_uow_dependency)) -> ProctoringRepository:
+    """
+    Создает репозиторий для сбора статистики прокторинга.
+    """
+    return ProctoringRepository(uow.session)
+
 
 def get_user_service(repository: UserRepository = Depends(get_user_repository)) -> UserService:
     """Создает сервис пользователей, прокидывая в него репозиторий пользователей."""
@@ -81,3 +95,10 @@ def get_test_service(
 ) -> TestService:
     """Создает сервис для тестов, прокидывая в него репозитории вопросов, медиа и опций."""
     return TestService(test_repo, question_repo, option_repo, media_repo)
+
+def get_attempt_service(
+        attempt_repo: AttemptRepository = Depends(get_attempt_repository),
+        proctoring_repo: ProctoringRepository = Depends(get_proctoring_repository)
+) -> AttemptService:
+    """Создает сервис для прохождения теста (варианты ответа, прокторинг)"""
+    return AttemptService(attempt_repo, proctoring_repo)

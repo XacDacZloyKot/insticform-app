@@ -1,0 +1,125 @@
+from fastapi import APIRouter, Depends, Request, status
+from pydantic import BaseModel
+from starlette.responses import HTMLResponse, RedirectResponse, JSONResponse
+from src.core.templates import templates
+from src.core.utils.auth.access_rights import get_current_user
+from src.model.domain.user import User
+from src.core.dependencies import get_test_service
+from src.core.dependencies import get_attempt_service
+from src.services.test_service import TestService
+from src.services.attempt_service import AttemptService
+
+router = APIRouter(prefix='/attempts', tags=['Test Attempts'])
+
+class ProctoringData(BaseModel):
+    action_type: str
+    details: str = None
+
+@router.get("/intro/{test_id}", response_class=HTMLResponse)
+async def get_intro_page(
+        test_id: int, request: Request,
+        test_service: TestService = Depends(get_test_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Ознакомительная страница перед стартом теста."""
+    test = await test_service.get_test_by_id(test_id)
+    return templates.TemplateResponse("attempts/intro.html", {"request": request, "user": current_user, "test": test})
+
+@router.post("/start/{test_id}")
+async def start_test_attempt(
+        test_id: int,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Генерация попытки (старт таймера) и редирект в сам тест."""
+    attempt = await attempt_service.start_attempt(test_id, current_user.id)
+    return RedirectResponse(url=f"/attempts/{attempt.id}/take", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/{attempt_id}/take", response_class=HTMLResponse)
+async def take_test_page(
+        attempt_id: int, request: Request,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Сам интерфейс тестирования."""
+    attempt = await attempt_service.get_attempt_with_test(attempt_id)
+    return templates.TemplateResponse("attempts/take.html", {"request": request, "user": current_user, "attempt": attempt, "test": attempt.test})
+
+@router.post("/{attempt_id}/proctoring")
+async def log_proctoring(
+        attempt_id: int, data: ProctoringData,
+        attempt_service: AttemptService = Depends(get_attempt_service)
+):
+    """API-эндпоинт для фоновой записи событий прокторинга."""
+    await attempt_service.log_proctoring_event(attempt_id, data.action_type, data.details)
+    return JSONResponse(content={"status": "logged"})
+
+
+@router.post("/{attempt_id}/submit")
+async def submit_test_attempt(
+        attempt_id: int,
+        request: Request,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        test_service: TestService = Depends(get_test_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Принимает ответы студента и завершает тест."""
+    form_data = await request.form()
+
+    # Завершаем тест и считаем баллы
+    attempt = await attempt_service.finish_attempt(attempt_id, form_data)
+
+    await test_service.unassign_student(attempt.test_id, current_user.id)
+
+    return RedirectResponse(url=f"/attempts/{attempt_id}/result", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.get("/{attempt_id}/result", response_class=HTMLResponse)
+async def attempt_result_page(
+        attempt_id: int, request: Request,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Страница об успешном завершении теста."""
+    attempt = await attempt_service.get_attempt_with_test(attempt_id)
+    return templates.TemplateResponse("attempts/result.html",
+                                      {"request": request, "user": current_user, "attempt": attempt,
+                                       "test": attempt.test})
+
+
+@router.get("/{attempt_id}/details", response_class=HTMLResponse)
+async def attempt_details_page(
+        attempt_id: int, request: Request,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Детальная страница результатов тестирования (для преподавателей/админов)."""
+    attempt = await attempt_service.get_full_attempt_details(attempt_id)
+
+    proctoring_logs = sorted(attempt.proctoring_logs, key=lambda x: x.timestamp)
+
+    return templates.TemplateResponse(
+        "attempts/detail.html",
+        {"request": request, "user": current_user, "attempt": attempt, "proctoring_logs": proctoring_logs}
+    )
+
+@router.post("/{attempt_id}/proctoring/clear")
+async def clear_proctoring(
+        attempt_id: int,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Очистка логов прокторинга преподавателем."""
+    await attempt_service.clear_proctoring_logs(attempt_id)
+    return RedirectResponse(url=f"/attempts/{attempt_id}/details", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/{attempt_id}/delete")
+async def delete_test_attempt(
+        attempt_id: int,
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Полное удаление попытки прохождения теста."""
+    student_id = await attempt_service.delete_attempt(attempt_id)
+    return RedirectResponse(url=f"/users/{student_id}", status_code=status.HTTP_303_SEE_OTHER)

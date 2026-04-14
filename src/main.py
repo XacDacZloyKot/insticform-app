@@ -20,6 +20,7 @@ from src.presentation.routes.home import router as home_router
 from src.presentation.routes.tests import router as tests_router
 from src.presentation.routes.users import router as users_router
 from src.presentation.routes.landing import router as landing_router
+from src.presentation.routes.attempts import router as attempts_router
 
 setup_logging()
 logger = logging.getLogger("InsticForm")
@@ -58,7 +59,7 @@ app.include_router(users_router)
 app.include_router(academic_router)
 app.include_router(tests_router)
 app.include_router(landing_router)
-
+app.include_router(attempts_router)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):

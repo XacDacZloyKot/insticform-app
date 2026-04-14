@@ -22,11 +22,6 @@
                href="{% if user.role.value == 'admin' %}{{ url_for('get_home_admin_page') }}{% elif user.role.value == 'teacher' %}{{ url_for('get_home_teacher_page') }}{% else %}{{ url_for('get_home_student_page') }}{% endif %}">
                 <img src="{{ url_for('static', path='/img/Home.svg') }}" alt="Панель управления" class="sidebar-icon"> Панель управления
             </a>
-
-            <a class="nav-link nav-btn px-3 py-2 text-dark d-flex align-items-center gap-2 {% if request.url.path == '/' %}bg-light rounded{% endif %}"
-               href="{{ url_for('get_landing_page') }}">
-                <img src="{{ url_for('static', path='/img/Info.svg') }}" alt="О платформе" class="sidebar-icon"> О платформе
-            </a>
         </li>
 
         {% if user.role.value == 'admin' %}
