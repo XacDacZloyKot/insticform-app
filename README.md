@@ -48,3 +48,4 @@ uvicorn src.main:app --reload
 
 Обратная связь
 Пишите: vk.com/iamfromengland
+Почта: 251198@gapps.ispu.ru
