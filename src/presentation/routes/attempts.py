@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse, RedirectResponse, JSONResponse
@@ -35,6 +37,7 @@ async def start_test_attempt(
     attempt = await attempt_service.start_attempt(test_id, current_user.id)
     return RedirectResponse(url=f"/attempts/{attempt.id}/take", status_code=status.HTTP_303_SEE_OTHER)
 
+
 @router.get("/{attempt_id}/take", response_class=HTMLResponse)
 async def take_test_page(
         attempt_id: int, request: Request,
@@ -43,7 +46,27 @@ async def take_test_page(
 ):
     """Сам интерфейс тестирования."""
     attempt = await attempt_service.get_attempt_with_test(attempt_id)
-    return templates.TemplateResponse("attempts/take.html", {"request": request, "user": current_user, "attempt": attempt, "test": attempt.test})
+
+    time_left_seconds = None
+    if attempt.test.time_limit_minutes:
+        start_time = attempt.start_time
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+
+        elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+
+        time_left_seconds = max(0, int(attempt.test.time_limit_minutes * 60 - elapsed))
+
+    return templates.TemplateResponse(
+        "attempts/take.html",
+        {
+            "request": request,
+            "user": current_user,
+            "attempt": attempt,
+            "test": attempt.test,
+            "time_left_seconds": time_left_seconds
+        }
+    )
 
 @router.post("/{attempt_id}/proctoring")
 async def log_proctoring(

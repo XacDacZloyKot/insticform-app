@@ -5,7 +5,6 @@ from pydantic import BaseModel, ConfigDict
 from src.model.domain.enums import AttemptStatus, ProctoringAction
 
 
-# --- Прокторинг ---
 class ProctoringEventBase(BaseModel):
     action_type: ProctoringAction
     details: Optional[str] = None
@@ -21,7 +20,6 @@ class ProctoringEventResponse(ProctoringEventBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-# --- Ответы студента ---
 class StudentAnswerBase(BaseModel):
     question_id: int
     text_answer: Optional[str] = None
@@ -29,12 +27,10 @@ class StudentAnswerBase(BaseModel):
     selected_option_ids: List[int] = []
 
 
-# Схема для приема ответа от клиента
 class StudentAnswerCreate(StudentAnswerBase):
     pass
 
 
-# Схема для выдачи ответа (с ID и баллами)
 class StudentAnswerResponse(StudentAnswerBase):
     id: int
     is_correct: Optional[bool] = None
@@ -42,7 +38,6 @@ class StudentAnswerResponse(StudentAnswerBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-# --- Попытка прохождения ---
 class TestAttemptBase(BaseModel):
     test_id: int
     student_id: int

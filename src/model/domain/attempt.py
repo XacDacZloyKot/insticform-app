@@ -26,7 +26,6 @@ class TestAttempt(Base):
     test_id: Mapped[int] = mapped_column(ForeignKey("tests.id", ondelete="CASCADE"))
     student_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
-    # Используем timezone-aware datetime
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     end_time: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     status: Mapped[AttemptStatus] = mapped_column(Enum(AttemptStatus), default=AttemptStatus.IN_PROGRESS)
@@ -57,7 +56,6 @@ class StudentAnswer(Base):
     attempt: Mapped["TestAttempt"] = relationship(back_populates="student_answers")
     question: Mapped["Question"] = relationship()
 
-    # Отношение к выбранным вариантам (поддерживает и один, и несколько ответов)
     selected_options: Mapped[List["AnswerOption"]] = relationship(secondary="student_answer_option_link")
 
 
@@ -65,12 +63,10 @@ class ProctoringEvent(Base):
     """Событие прокторинга (например, переключение вкладки)."""
     __tablename__ = "proctoring_events"
 
-    # Добавляем составной индекс для ускорения аналитических выборок
     __table_args__ = (
         Index('ix_proctoring_event_attempt_timestamp', 'attempt_id', 'timestamp'),
     )
 
-    # Убираем index=True у attempt_id, так как он теперь входит в составной индекс выше
     attempt_id: Mapped[int] = mapped_column(ForeignKey("test_attempts.id", ondelete="CASCADE"))
 
     action_type: Mapped[ProctoringAction] = mapped_column(Enum(ProctoringAction))

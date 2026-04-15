@@ -11,6 +11,5 @@ router = APIRouter(
 
 @router.get("/", name="get_landing_page")
 async def get_landing_page(
-        request: Request,
-        current_user: User = Depends(get_current_user)):
-    return templates.TemplateResponse("landing/index.html", {"request": request, "user": current_user})
+        request: Request):
+    return templates.TemplateResponse("landing/index.html", {"request": request})

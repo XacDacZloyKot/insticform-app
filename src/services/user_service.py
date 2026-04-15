@@ -136,7 +136,6 @@ class UserService:
     async def get_user_with_relations(self, user_id: int) -> User:
         """Получение информации о пользователе вместе с назначенными тестами."""
         try:
-            # Подгружаем назначенные тесты и сразу их дисциплины
             joins = [
                 selectinload(User.assigned_tests).selectinload(Test.discipline),
                 selectinload(User.test_attempts).selectinload(TestAttempt.test).selectinload(Test.discipline)

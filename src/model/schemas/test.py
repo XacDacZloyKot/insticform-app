@@ -3,7 +3,6 @@ from pydantic import BaseModel, ConfigDict
 
 from src.model.domain.enums import GradingMethod, QuestionType
 
-# ВАРИАНТЫ ОТВЕТОВ
 class AnswerOptionBase(BaseModel):
     text: str
 
@@ -23,7 +22,6 @@ class AnswerOptionTeacherResponse(AnswerOptionStudentResponse):
     score_weight: float
 
 
-# ВОПРОСЫ
 class QuestionBase(BaseModel):
     text: str
     media_url: Optional[str] = None
@@ -46,7 +44,6 @@ class QuestionTeacherResponse(QuestionBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-# ТЕСТЫ
 class TestBase(BaseModel):
     title: str
     description: Optional[str] = None

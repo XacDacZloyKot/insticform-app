@@ -13,7 +13,6 @@ class AcademicService:
         self.group_repo = group_repo
         self.discipline_repo = discipline_repo
 
-    # СОЗДАНИЕ
     async def create_group(self, group_data: GroupBase) -> Group:
         existing = await self.group_repo.find_first(name=group_data.name)
         if existing:
@@ -25,21 +24,18 @@ class AcademicService:
         new_discipline = Discipline(name=discipline_data.name, description=discipline_data.description)
         return await self.discipline_repo.create(new_discipline)
 
-    # ЧТЕНИЕ СПИСКОВ
     async def list_groups(self) -> List[Group]:
         return await self.group_repo.list()
 
     async def list_disciplines(self) -> List[Discipline]:
         return await self.discipline_repo.list()
 
-    # ЧТЕНИЕ ОДНОЙ СУЩНОСТИ
     async def get_group_by_id(self, group_id: int) -> Group:
         return await self.group_repo.get_one(id=group_id)
 
     async def get_discipline_by_id(self, discipline_id: int) -> Discipline:
         return await self.discipline_repo.get_one(id=discipline_id)
 
-    # УДАЛЕНИЕ
     async def delete_group(self, group_id: int) -> None:
         await self.group_repo.delete(group_id)
 
@@ -69,7 +65,6 @@ class AcademicService:
         return await self.discipline_repo.get_one_with_joins(joins=[selectinload(Discipline.teachers)],
                                                              id=discipline_id)
 
-    # --- СВЯЗЫВАНИЕ: ГРУППЫ И СТУДЕНТЫ ---
     async def add_student_to_group(self, group_id: int, student: User) -> None:
         group = await self.get_group_with_relations(group_id)
         await self.group_repo.add_student(group, student)
@@ -80,7 +75,6 @@ class AcademicService:
         if student_to_remove:
             await self.group_repo.remove_student(group, student_to_remove)
 
-    # --- СВЯЗЫВАНИЕ: ДИСЦИПЛИНЫ И ПРЕПОДАВАТЕЛИ ---
     async def add_teacher_to_discipline(self, discipline_id: int, teacher: User) -> None:
         discipline = await self.get_discipline_with_relations(discipline_id)
         await self.discipline_repo.add_teacher(discipline, teacher)

@@ -55,20 +55,20 @@ class AttemptService:
             selected_options = []
             text_answer = None
 
-            # Логика для выбора одного или нескольких вариантов (тесты)
+            # Логика для выбора одного или нескольких вариантов
             if question.type.value in ['single_choice', 'multiple_choice']:
-                # Получаем все выбранные чекбоксы/радиокнопки для этого вопроса (getlist)
+                # Получаем все выбранные чекбоксы для этого вопроса
                 submitted_values = form_data.getlist(f"q_{question.id}")
                 submitted_ids = [int(v) for v in submitted_values if v.isdigit()]
 
-                # Достаем реальные объекты вариантов из БД
+                # Достаем правильные объекты вариантов из БД
                 selected_options = [opt for opt in question.options if opt.id in submitted_ids]
                 correct_options = [opt for opt in question.options if opt.is_correct]
 
                 set_selected = set(opt.id for opt in selected_options)
                 set_correct = set(opt.id for opt in correct_options)
 
-                # Если студент выбрал в точности все правильные варианты
+                # Если студент выбрал все правильные варианты
                 if set_selected == set_correct and len(set_correct) > 0:
                     awarded_score = sum(opt.score_weight for opt in correct_options)
                 # Если частичный балл разрешен (выбрал только часть правильных)
@@ -80,7 +80,7 @@ class AttemptService:
             # Логика для открытого текстового вопроса (эссе)
             else:
                 text_answer = form_data.get(f"q_{question.id}")
-                awarded_score = 0.0  # Автопроверку текста реализовать сложно, оставляем 0 до ручной проверки преподавателем
+                awarded_score = 0.0
 
             # Создаем объект ответа студента и прикрепляем к попытке
             student_answer = StudentAnswer(
@@ -93,7 +93,7 @@ class AttemptService:
             attempt.student_answers.append(student_answer)
             total_score += awarded_score
 
-        # Фиксируем общий балл и закрываем попытку
+        # Фиксируем общий балл
         attempt.total_score = total_score
         await self.attempt_repo.finish_attempt(attempt)
 

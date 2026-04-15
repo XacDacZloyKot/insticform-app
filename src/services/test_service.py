@@ -31,7 +31,6 @@ class TestService:
         # Сохраняем файлы на комп
         relative_path, media_type = await save_upload_file(file)
 
-        # Создаем запись в БД
         new_media = TestMedia(
             test_id=test_id,
             file_path=relative_path,
@@ -68,7 +67,6 @@ class TestService:
         if file and file.filename:
             media_path, media_type = await save_upload_file(file)
 
-        # Создаем сам вопрос
         new_question = Question(
             test_id=test_id,
             text=question_data.text,
@@ -94,19 +92,15 @@ class TestService:
 
     async def delete_test(self, test_id: int) -> None:
         """Удаляет тест и все связанные с ним физические файлы."""
-        # Получаем тест (вопросы и медиа)
         test = await self.get_test_by_id(test_id)
 
-        # Удаляем глобальные медиафайлы теста
         for media in test.media_files:
             delete_physical_file(media.file_path)
 
-        # Удаляем медиафайлы каждого вопроса
         for question in test.questions:
             if question.media_url:
                 delete_physical_file(question.media_url)
 
-        # Удаляем тест из БД
         await self.test_repo.delete(test_id)
 
     async def delete_question(self, question_id: int) -> None:
@@ -126,7 +120,6 @@ class TestService:
         """Удаляет только медиафайл у вопроса, оставляя сам вопрос."""
         question = await self.question_repo.get_one(id=question_id)
         if question.media_url:
-            # Удаляем физически с диска
             delete_physical_file(question.media_url)
             await self.question_repo.remove_media(question)
 
