@@ -23,7 +23,7 @@ async def list_users(request: Request, user_service: UserService = Depends(get_u
 
 @router.get("/create/teacher", response_class=HTMLResponse)
 async def get_create_teacher_page(request: Request, current_user: User = Depends(get_current_admin)):
-    return templates.TemplateResponse("users/create_teacher.html", {"request": request, "user": current_user})
+    return templates.TemplateResponse("users/user_form.html", {"request": request, "user": current_user})
 
 
 @router.post("/create/teacher", response_class=HTMLResponse)
@@ -35,7 +35,7 @@ async def post_create_teacher(
         await user_service.register_user(form_data)
         return RedirectResponse(url="/users", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
-        return templates.TemplateResponse("users/create_teacher.html",
+        return templates.TemplateResponse("users/user_form.html",
                                           {"request": request, "user": current_user, "error": str(e)})
 
 
@@ -66,8 +66,16 @@ async def user_detail(
 
 
 @router.post("/{user_id}/delete")
-async def delete_user(user_id: int, user_service: UserService = Depends(get_user_service),
-                      current_user: User = Depends(get_current_admin)):
+async def delete_user(
+        user_id: int,
+        user_service: UserService = Depends(get_user_service),
+        current_user: User = Depends(get_current_admin)
+):
+    user_to_delete = await user_service.get_user_by_id(user_id)
+
+    if user_to_delete.role.value == 'admin':
+        return RedirectResponse(url=f"/users/{user_id}", status_code=status.HTTP_303_SEE_OTHER)
+
     await user_service.delete_user(user_id)
     return RedirectResponse(url="/users", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -76,7 +84,7 @@ async def delete_user(user_id: int, user_service: UserService = Depends(get_user
 async def get_edit_user_page(user_id: int, request: Request, user_service: UserService = Depends(get_user_service),
                              current_user: User = Depends(get_current_admin)):
     target_user = await user_service.get_user_by_id(user_id)
-    return templates.TemplateResponse("users/create_teacher.html",
+    return templates.TemplateResponse("users/user_form.html",
                                       {"request": request, "user": current_user, "target_user": target_user,
                                        "edit_mode": True})
 
@@ -91,7 +99,7 @@ async def post_edit_user(
         return RedirectResponse(url=f"/users/{user_id}", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         target_user = await user_service.get_user_by_id(user_id)
-        return templates.TemplateResponse("users/create_teacher.html",
+        return templates.TemplateResponse("users/user_form.html",
                                           {"request": request, "user": current_user, "target_user": target_user,
                                            "edit_mode": True, "error": str(e)})
 

@@ -9,7 +9,8 @@ from starlette.responses import HTMLResponse
 from starlette.responses import JSONResponse
 from starlette.responses import RedirectResponse
 
-from src.core.dependencies import get_academic_service
+from src.services.user_service import UserService
+from src.core.dependencies import get_academic_service, get_user_service
 from src.core.dependencies import get_test_service
 from src.core.templates import templates
 from src.core.utils.auth.access_rights import get_current_user
@@ -25,13 +26,34 @@ router = APIRouter(prefix='/tests', tags=['Tests Management'])
 @router.get("", response_class=HTMLResponse)
 async def list_tests_page(
         request: Request,
+        discipline_id: Optional[int] = None,
         test_service: TestService = Depends(get_test_service),
+        academic_service: AcademicService = Depends(get_academic_service),
+        user_service: UserService = Depends(get_user_service),
         current_user: User = Depends(get_current_user)
 ):
-    tests = await test_service.list_tests()
+    if current_user.role.value not in ['admin', 'teacher']:
+        return RedirectResponse(url="/", status_code=303)
+
+    user_with_relations = await user_service.get_user_with_relations(current_user.id)
+
+    # Получаем отфильтрованные тесты
+    tests = await test_service.list_tests_for_staff(user_with_relations, discipline_id)
+
+    if current_user.role.value == 'admin':
+        disciplines = await academic_service.list_disciplines()
+    else:
+        disciplines = user_with_relations.taught_disciplines
+
     return templates.TemplateResponse(
         "tests/list.html",
-        {"request": request, "user": current_user, "tests": tests}
+        {
+            "request": request,
+            "user": current_user,
+            "tests": tests,
+            "disciplines": disciplines,
+            "selected_discipline_id": discipline_id
+        }
     )
 
 
@@ -93,13 +115,21 @@ async def upload_test_media(
 async def get_create_test_page(
         request: Request,
         academic_service: AcademicService = Depends(get_academic_service),
+        user_service: UserService = Depends(get_user_service),
         current_user: User = Depends(get_current_user)
 ):
     """Страница создания оболочки теста."""
-    # Получаем дисциплины, чтобы препод мог выбрать, к какому предмету привязать тест
-    disciplines = await academic_service.list_disciplines()
+    user_with_relations = await user_service.get_user_with_relations(current_user.id)
+
+    if current_user.role.value == 'admin':
+        disciplines = await academic_service.list_disciplines()
+    else:
+        disciplines = user_with_relations.taught_disciplines
+
     return templates.TemplateResponse("tests/create_test.html", {
-        "request": request, "user": current_user, "disciplines": disciplines
+        "request": request,
+        "user": current_user,
+        "disciplines": disciplines
     })
 
 
@@ -111,7 +141,7 @@ async def post_create_test(
         current_user: User = Depends(get_current_user)
 ):
     """Обработка формы и редирект в конструктор вопросов."""
-    form_data["creator_id"] = current_user.id  # Записываем, кто автор теста
+    form_data["creator_id"] = current_user.id
 
     # Создаем тест в БД
     test = await test_service.create_test(form_data)
@@ -135,8 +165,17 @@ async def test_detail_page(
 
 
 @router.post("/{test_id}/delete")
-async def delete_test(test_id: int, test_service: TestService = Depends(get_test_service),
-                      current_user: User = Depends(get_current_user)):
+async def delete_test(
+        test_id: int,
+        test_service: TestService = Depends(get_test_service),
+        current_user: User = Depends(get_current_user)
+):
+    """Удаление теста (только для создателя или администратора)"""
+    test = await test_service.get_test_by_id(test_id)
+
+    if current_user.role.value != 'admin' and test.creator_id != current_user.id:
+        return RedirectResponse(url="/tests", status_code=status.HTTP_303_SEE_OTHER)
+
     await test_service.delete_test(test_id)
     return RedirectResponse(url="/tests", status_code=status.HTTP_303_SEE_OTHER)
 

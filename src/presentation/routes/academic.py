@@ -57,19 +57,30 @@ async def group_detail(
         academic_service: AcademicService = Depends(get_academic_service),
         test_service: TestService = Depends(get_test_service),
         user_service: UserService = Depends(get_user_service),
-        current_user: User = Depends(get_current_teacher)
+        current_user: User = Depends(get_current_teacher)  
 ):
     group = await academic_service.get_group_with_relations(group_id)
     all_students = await user_service.list(role=UserRole.STUDENT)
 
-    available_tests = await test_service.list_tests()
+    all_tests = await test_service.list_tests()
 
-    # Отфильтровываем тех, кто УЖЕ в этой группе, чтобы не предлагать их добавить дважды
+    if current_user.role == UserRole.ADMIN:
+        available_tests = all_tests
+    else:
+        teacher_discipline_ids = [d.id for d in getattr(current_user, 'taught_disciplines', [])]
+
+        available_tests = [
+            t for t in all_tests
+            if t.discipline_id in teacher_discipline_ids or t.creator_id == current_user.id
+        ]
+
     existing_student_ids = [s.id for s in group.students]
     available_students = [s for s in all_students if s.id not in existing_student_ids]
 
     return templates.TemplateResponse("academic/group_detail.html", {
-        "request": request, "user": current_user, "group": group,
+        "request": request,
+        "user": current_user,
+        "group": group,
         "available_tests": available_tests,
         "available_students": available_students
     })
