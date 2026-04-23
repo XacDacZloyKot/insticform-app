@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% block title %}Создание преподавателя{% endblock %}
+{% block title %}{% if edit_mode %}Редактирование пользователя{% else %}Создание преподавателя{% endif %}{% endblock %}
 {% block header_title %}Управление пользователями{% endblock %}
 
 {% block content %}
@@ -10,16 +10,22 @@
                 <h4 class="fw-bold text-primary mb-4">
                     <img src="{{ url_for('static', path='/img/Users.svg') }}" alt="Пользователи"
                          style="width: 28px; opacity: 0.8;" class="me-2">
-                    {% if edit_mode %}Редактирование пользователя{% else %}Новый преподаватель{% endif %}
+                    {% if edit_mode %}
+                        Редактирование пользователя
+                    {% else %}
+                        Новый преподаватель
+                    {% endif %}
                 </h4>
 
                 {% if success %}
-                    <div class="alert alert-success py-2">Успешно!</div>{% endif %}
+                    <div class="alert alert-success py-2">Успешно!</div>
+                {% endif %}
                 {% if error %}
-                    <div class="alert alert-danger py-2">{{ error }}</div>{% endif %}
+                    <div class="alert alert-danger py-2">{{ error }}</div>
+                {% endif %}
 
-                <form action="{% if edit_mode %}/users/{{ target_user.id }}/edit{% else %}/users/create/teacher{% endif %}"
-                      method="post">
+                <form action="{% if edit_mode %}/users/{{ target_user.id }}/edit{% else %}/users/create/teacher{% endif %}" method="post">
+
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-secondary">Логин системы</label>
                         <input type="text" class="form-control" name="username"
@@ -46,9 +52,30 @@
                                value="{{ target_user.patronymic if edit_mode and target_user.patronymic else '' }}">
                     </div>
 
+                    {% if edit_mode %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-secondary">Роль в системе</label>
+
+                            <select name="role" class="form-select" {% if target_user.role.value == 'admin' %}disabled{% endif %} required>
+                                <option value="student" {% if target_user.role.value == 'student' %}selected{% endif %}>Студент</option>
+                                <option value="teacher" {% if target_user.role.value == 'teacher' %}selected{% endif %}>Преподаватель</option>
+
+                                {% if target_user.role.value == 'admin' %}
+                                    <option value="admin" selected>Администратор</option>
+                                {% endif %}
+                            </select>
+
+                            {% if target_user.role.value == 'admin' %}
+                                <div class="form-text text-danger mt-1">Изменение роли администратора заблокировано.</div>
+                                <input type="hidden" name="role" value="admin">
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
                     <div class="mb-4">
-                        <label class="form-label fw-bold small text-secondary">{% if edit_mode %}Новый пароль{% else %}
-                            Временный пароль{% endif %}</label>
+                        <label class="form-label fw-bold small text-secondary">
+                            {% if edit_mode %}Новый пароль{% else %}Временный пароль{% endif %}
+                        </label>
                         <input type="password" class="form-control" name="password"
                                placeholder="{% if edit_mode %}Оставьте пустым, чтобы не менять{% else %}Минимум 6 символов{% endif %}"
                                minlength="6" {% if not edit_mode %}required{% endif %}>

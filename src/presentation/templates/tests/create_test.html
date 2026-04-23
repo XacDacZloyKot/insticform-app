@@ -20,11 +20,18 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold small text-secondary">Привязка к дисциплине</label>
                     <select class="form-select" name="discipline_id" required>
-                        <option value="" disabled selected>Выберите дисциплину...</option>
-                        {% for d in disciplines %}
-                            <option value="{{ d.id }}">{{ d.name }}</option>
-                        {% endfor %}
+                        {% if disciplines %}
+                            <option value="" disabled selected>Выберите дисциплину...</option>
+                            {% for d in disciplines %}
+                                <option value="{{ d.id }}">{{ d.name }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled selected>Нет доступных дисциплин</option>
+                        {% endif %}
                     </select>
+                    {% if not disciplines and user.role.value == 'teacher' %}
+                        <div class="form-text text-danger mt-1">Вам пока не назначена ни одна дисциплина. Обратитесь к администратору.</div>
+                    {% endif %}
                 </div>
 
                 <div class="mb-3">

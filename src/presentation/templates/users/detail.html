@@ -15,6 +15,7 @@
                                  style="width: 18px;">
                             Изменить
                         </a>
+                        {% if target_user.role.value != 'admin' %}
                         <form action="/users/{{ target_user.id }}/delete" method="post"
                               onsubmit="return confirm('Вы уверены, что хотите удалить этого пользователя?');"
                               class="m-0">
@@ -25,6 +26,7 @@
                                 Удалить
                             </button>
                         </form>
+                        {% endif %}
                     </div>
                 </div>
 

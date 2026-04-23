@@ -8,7 +8,7 @@
     <div class="col-md-10 mx-auto">
         <div class="card card-custom p-4 shadow-sm border-0 mb-4">
             <h3 class="fw-bold mb-3 text-primary">Системная сводка</h3>
-            <p class="fs-5 text-secondary">Привет, <strong>{{ user.first_name }}</strong>! Главная панель управления платформой.</p>
+            <p class="fs-5 text-secondary">Привет, <strong>{{ user.first_name }} {{ user.last_name }}</strong>! Главная панель управления платформой.</p>
             
             <hr class="text-muted my-3">
             
@@ -20,7 +20,7 @@
                         </div>
                         <div>
                             <h4 class="fw-bold mb-0">Пользователи</h4>
-                            <a href="#" class="text-decoration-none small text-muted">Управление <span class="fs-5">→</span></a>
+                            <a href="{{ url_for('list_users') }}" class="text-decoration-none small text-muted">Управление <span class="fs-5">→</span></a>
                         </div>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                         </div>
                         <div>
                             <h4 class="fw-bold mb-0">Группы</h4>
-                            <a href="#" class="text-decoration-none small text-muted">Смотреть список <span class="fs-5">→</span></a>
+                            <a href="{{ url_for('list_groups') }}" class="text-decoration-none small text-muted">Смотреть список <span class="fs-5">→</span></a>
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                         </div>
                         <div>
                             <h4 class="fw-bold mb-0">Дисциплины</h4>
-                            <a href="#" class="text-decoration-none small text-muted">Настроить <span class="fs-5">→</span></a>
+                            <a href="{{ url_for('list_disciplines') }}" class="text-decoration-none small text-muted">Настроить <span class="fs-5">→</span></a>
                         </div>
                     </div>
                 </div>
