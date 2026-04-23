@@ -56,23 +56,12 @@
 
                 <hr class="text-muted my-4">
 
-                <hr class="text-muted my-4">
-
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold m-0">Закрепленные преподаватели</h5>
+                    <h5 class="fw-bold m-0">Закрепленные преподаватели ({{ discipline.teachers|length }})</h5>
 
-                    <form action="/academic/disciplines/{{ discipline.id }}/add_teacher" method="post"
-                          class="d-flex gap-2 m-0">
-                        <select name="teacher_id" class="form-select form-select-sm border-secondary shadow-sm"
-                                style="width: 250px;" required>
-                            <option value="" disabled selected>Выберите преподавателя...</option>
-                            {% for t in available_teachers %}
-                                <option value="{{ t.id }}">{{ t.last_name }} {{ t.first_name }} ({{ t.username }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">Назначить</button>
-                    </form>
+                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                        + Назначить
+                    </button>
                 </div>
 
                 <div class="table-responsive border rounded bg-white">
@@ -81,7 +70,7 @@
                         <tr>
                             <th class="ps-3">ФИО</th>
                             <th>Логин</th>
-                            <th class="text-end pe-3">Снять назначение</th>
+                            <th class="text-end pe-3">Снять</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -91,8 +80,11 @@
                                 <td><code>{{ teacher.username }}</code></td>
                                 <td class="text-end pe-3">
                                     <form action="/academic/disciplines/{{ discipline.id }}/remove_teacher/{{ teacher.id }}"
-                                          method="post" class="m-0">
-                                        <button type="submit" class="btn btn-sm btn-light border text-danger">Снять
+                                          method="post" class="m-0"
+                                          onsubmit="return confirm('Снять преподавателя с дисциплины?');">
+                                        <button type="submit" class="btn btn-sm btn-light border text-danger" title="Снять назначение">
+                                            <img src="{{ url_for('static', path='/img/delete.svg') }}"
+                                                 style="width: 14px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(340deg);">
                                         </button>
                                     </form>
                                 </td>
@@ -111,4 +103,84 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addTeacherModalLabel">Назначение преподавателя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 border-bottom bg-light">
+                        <input type="text" id="teacherSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по ФИО или логину..." autofocus>
+                    </div>
+
+                    <div class="list-group list-group-flush" id="teacherList">
+                        {% for t in available_teachers %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ t.last_name|lower }} {{ t.first_name|lower }} {{ t.username|lower }}">
+                                <div>
+                                    <span class="fw-bold text-dark">{{ t.last_name }} {{ t.first_name }}</span><br>
+                                    <small class="text-muted">{{ t.username }}</small>
+                                </div>
+                                <form action="/academic/disciplines/{{ discipline.id }}/add_teacher" method="post" class="m-0">
+                                    <input type="hidden" name="teacher_id" value="{{ t.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-bold">Назначить</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                Все зарегистрированные преподаватели уже назначены на эту дисциплину или преподавателей нет в системе.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function setupModalSearch(inputId, listId, modalId) {
+                const searchInput = document.getElementById(inputId);
+                const listItems = document.querySelectorAll(`#${listId} .search-item`);
+                const modalElement = document.getElementById(modalId);
+
+                if (!searchInput || !modalElement) return;
+
+                // Ставим фокус на поле ввода при открытии окна
+                modalElement.addEventListener('shown.bs.modal', function () {
+                    searchInput.focus();
+                });
+
+                // Обрабатываем ввод текста
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+
+                    listItems.forEach(item => {
+                        const searchString = item.getAttribute('data-search');
+                        if (searchString.includes(query)) {
+                            item.classList.remove('d-none');
+                            item.classList.add('d-flex');
+                        } else {
+                            item.classList.remove('d-flex');
+                            item.classList.add('d-none');
+                        }
+                    });
+                });
+
+                // Очищаем поиск при закрытии окна
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    searchInput.value = '';
+                    listItems.forEach(item => {
+                        item.classList.remove('d-none');
+                        item.classList.add('d-flex');
+                    });
+                });
+            }
+
+            // Инициализируем поиск для преподавателей
+            setupModalSearch('teacherSearchInput', 'teacherList', 'addTeacherModal');
+        });
+    </script>
 {% endblock %}

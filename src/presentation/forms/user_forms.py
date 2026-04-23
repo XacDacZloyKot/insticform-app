@@ -59,17 +59,20 @@ def create_teacher_form(
     except ValidationError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
 
+
 def edit_user_form(
         username: str = Form(..., max_length=50, description="Имя пользователя"),
         first_name: str = Form(..., max_length=64, description="Имя"),
         last_name: str = Form(..., max_length=64, description="Фамилия"),
         patronymic: Optional[str] = Form(None, max_length=64, description="Отчество"),
-        password: Optional[str] = Form(None, description="Новый пароль (если пустой - не меняем)")
+        password: Optional[str] = Form(None, description="Новый пароль (если пустой - не меняем)"),
+        role: UserRole = Form(..., description="Роль пользователя")
 ) -> dict:
     return {
         "username": username,
         "first_name": first_name,
         "last_name": last_name,
         "patronymic": patronymic or "",
-        "password": password if password else None
+        "password": password if password else None,
+        "role": role
     }

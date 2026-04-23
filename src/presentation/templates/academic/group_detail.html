@@ -46,17 +46,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold m-0">Студенты в группе ({{ group.students|length }})</h5>
 
-                    <form action="/academic/groups/{{ group.id }}/add_student" method="post" class="d-flex gap-2 m-0">
-                        <select name="student_id" class="form-select form-select-sm border-secondary shadow-sm"
-                                style="width: 250px;" required>
-                            <option value="" disabled selected>Выберите студента...</option>
-                            {% for s in available_students %}
-                                <option value="{{ s.id }}">{{ s.last_name }} {{ s.first_name }} ({{ s.username }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">Добавить</button>
-                    </form>
+                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                        + Добавить студента
+                    </button>
                 </div>
 
                 <div class="table-responsive border rounded bg-white">
@@ -97,29 +89,144 @@
 
                 <hr class="text-muted my-4">
 
-                <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded border border-primary border-opacity-25">
-                    <div>
-                        <h5 class="fw-bold m-0 text-primary">Выдать тест группе</h5>
-                        <span class="small text-muted">Тест будет назначен каждому студенту индивидуально</span>
+                <div class="p-3 bg-light rounded border border-primary border-opacity-25 shadow-sm mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold m-0 text-primary">Назначить тест группе</h5>
+                            <span class="small text-muted">Доступно тестов для выдачи: {{ available_tests|length }}</span>
+                        </div>
+                        <button type="button" class="btn btn-primary fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignTestModal">
+                            Выбрать тест
+                        </button>
                     </div>
-
-                    <form action="/academic/groups/{{ group.id }}/assign_test" method="post" class="d-flex gap-2 m-0">
-                        <select name="test_id" class="form-select form-select-sm border-secondary shadow-sm"
-                                style="width: 300px;" required>
-                            <option value="" disabled selected>Выберите тест из банка...</option>
-                            {% for t in available_tests %}
-                                <option value="{{ t.id }}">{{ t.title }}
-                                    ({{ t.discipline.name if t.discipline else 'Без дисциплины' }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">Назначить</button>
-                    </form>
                 </div>
+
                 <hr class="text-muted my-4">
 
                 <a href="/academic/groups" class="btn btn-outline-secondary mt-4 w-100">Вернуться к списку групп</a>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="addStudentModalLabel">Добавление студента в группу</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 border-bottom bg-light">
+                        <input type="text" id="studentSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по ФИО или логину..." autofocus>
+                    </div>
+
+                    <div class="list-group list-group-flush" id="studentList">
+                        {% for s in available_students %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ s.last_name|lower }} {{ s.first_name|lower }} {{ s.username|lower }}">
+                                <div>
+                                    <span class="fw-bold text-dark">{{ s.last_name }} {{ s.first_name }}</span><br>
+                                    <small class="text-muted">{{ s.username }}</small>
+                                </div>
+                                <form action="/academic/groups/{{ group.id }}/add_student" method="post" class="m-0">
+                                    <input type="hidden" name="student_id" value="{{ s.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-bold">Добавить</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                Все зарегистрированные студенты уже состоят в этой группе.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-labelledby="assignTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="assignTestModalLabel">Выбор теста для назначения</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 border-bottom bg-light">
+                        <input type="text" id="testSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по названию или дисциплине...">
+                    </div>
+
+                    <div class="list-group list-group-flush" id="testList">
+                        {% for t in available_tests %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ t.title|lower }} {{ t.discipline.name|lower if t.discipline else '' }}">
+                                <div class="pe-3">
+                                    <span class="fw-bold text-dark d-block">{{ t.title }}</span>
+                                    <span class="badge bg-info text-dark mt-1" style="font-size: 0.75rem;">
+                                        {{ t.discipline.name if t.discipline else 'Без дисциплины' }}
+                                    </span>
+                                </div>
+                                <form action="/academic/groups/{{ group.id }}/assign_test" method="post" class="m-0">
+                                    <input type="hidden" name="test_id" value="{{ t.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">Выдать</button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                Нет доступных тестов для назначения.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // Функция, которая настраивает поиск для любого модального окна
+            function setupModalSearch(inputId, listId, modalId) {
+                const searchInput = document.getElementById(inputId);
+                const listItems = document.querySelectorAll(`#${listId} .search-item`);
+                const modalElement = document.getElementById(modalId);
+
+                if (!searchInput || !modalElement) return;
+
+                // Ставим фокус на поле ввода при открытии окна
+                modalElement.addEventListener('shown.bs.modal', function () {
+                    searchInput.focus();
+                });
+
+                // Обрабатываем ввод текста
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+
+                    listItems.forEach(item => {
+                        // Берем строку для поиска из атрибута data-search
+                        const searchString = item.getAttribute('data-search');
+
+                        // Если находим совпадение, показываем элемент, иначе скрываем
+                        if (searchString.includes(query)) {
+                            item.classList.remove('d-none');
+                            item.classList.add('d-flex');
+                        } else {
+                            item.classList.remove('d-flex');
+                            item.classList.add('d-none');
+                        }
+                    });
+                });
+
+                // Очищаем поиск при закрытии окна
+                modalElement.addEventListener('hidden.bs.modal', function () {
+                    searchInput.value = '';
+                    listItems.forEach(item => {
+                        item.classList.remove('d-none');
+                        item.classList.add('d-flex');
+                    });
+                });
+            }
+
+            setupModalSearch('studentSearchInput', 'studentList', 'addStudentModal');
+            setupModalSearch('testSearchInput', 'testList', 'assignTestModal');
+        });
+    </script>
 {% endblock %}
