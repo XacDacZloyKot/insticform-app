@@ -119,3 +119,55 @@ class AttemptService:
         student_id = attempt.student_id
         await self.attempt_repo.delete(attempt_id)
         return student_id
+
+    async def list_attempts_for_staff(self, user) -> list[TestAttempt]:
+        """
+        Возвращает список попыток в зависимости от роли:
+        Админ видит все попытки.
+        Преподаватель видит попытки по своим дисциплинам и созданным тестам.
+        """
+        joins = [
+            selectinload(TestAttempt.student),
+            selectinload(TestAttempt.test).selectinload(Test.discipline)
+        ]
+        all_attempts = await self.attempt_repo.list_with_joins(
+            joins=joins,
+            order_by="start_time",
+            order_direction="desc"
+        )
+
+        if user.role.value == 'admin':
+            return all_attempts
+
+        teacher_discipline_ids = [d.id for d in getattr(user, 'taught_disciplines', [])]
+        filtered_attempts = [
+            a for a in all_attempts
+            if a.test.discipline_id in teacher_discipline_ids or a.test.creator_id == user.id
+        ]
+
+        return filtered_attempts
+
+    async def list_all_proctoring_events(self, user) -> list[ProctoringEvent]:
+        """
+        Возвращает общую ленту событий прокторинга с фильтрацией по ролям.
+        """
+        # Подгружаем цепочку: Событие -> Попытка -> Студент / Тест -> Дисциплина
+        joins = [
+            selectinload(ProctoringEvent.attempt).selectinload(TestAttempt.student),
+            selectinload(ProctoringEvent.attempt).selectinload(TestAttempt.test).selectinload(Test.discipline)
+        ]
+
+        all_events = await self.proctoring_repo.list_with_joins(
+            joins=joins,
+            order_by="timestamp",
+            order_direction="desc"
+        )
+
+        if user.role.value == 'admin':
+            return all_events
+
+        teacher_discipline_ids = [d.id for d in getattr(user, 'taught_disciplines', [])]
+        return [
+            e for e in all_events
+            if e.attempt.test.discipline_id in teacher_discipline_ids or e.attempt.test.creator_id == user.id
+        ]

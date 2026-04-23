@@ -134,3 +134,25 @@ class TestService:
         student_to_remove = next((s for s in test.assigned_students if s.id == student_id), None)
         if student_to_remove:
             await self.test_repo.unassign_student(test, student_to_remove)
+
+    async def list_tests_for_staff(self, user, discipline_id: Optional[int] = None) -> List[Test]:
+        """Возвращает список тестов с учетом роли и выбранного фильтра по дисциплине."""
+        joins = [
+            selectinload(Test.discipline),
+            selectinload(Test.questions)
+        ]
+        all_tests = await self.test_repo.list_with_joins(joins=joins)
+
+        if user.role.value == 'admin':
+            filtered_tests = all_tests
+        else:
+            teacher_discipline_ids = [d.id for d in getattr(user, 'taught_disciplines', [])]
+            filtered_tests = [
+                t for t in all_tests
+                if t.discipline_id in teacher_discipline_ids or t.creator_id == user.id
+            ]
+
+        if discipline_id:
+            filtered_tests = [t for t in filtered_tests if t.discipline_id == discipline_id]
+
+        return filtered_tests

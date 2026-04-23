@@ -134,10 +134,15 @@ class UserService:
         return await self.user_repository.update(id=user_id, data=update_data)
 
     async def get_user_with_relations(self, user_id: int) -> User:
-        """Получение информации о пользователе вместе с назначенными тестами."""
+        """
+        Получение информации о пользователе вместе со всеми необходимыми связями
+        (для студентов и преподавателей).
+        """
         try:
             joins = [
                 selectinload(User.assigned_tests).selectinload(Test.discipline),
+                selectinload(User.assigned_tests).selectinload(Test.questions),
+                selectinload(User.taught_disciplines),
                 selectinload(User.test_attempts).selectinload(TestAttempt.test).selectinload(Test.discipline)
             ]
             return await self.user_repository.get_one_with_joins(id=user_id, joins=joins)
