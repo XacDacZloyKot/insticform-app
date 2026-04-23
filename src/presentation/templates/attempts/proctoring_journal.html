@@ -1,0 +1,82 @@
+{% extends "base/base.html" %}
+
+{% block title %}Журнал прокторинга{% endblock %}
+{% block header_title %}Контроль честности{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card card-custom p-4 shadow-sm border-0">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-primary m-0">
+                    <img src="{{ url_for('static', path='/img/Info.svg') }}" style="width: 24px; filter: invert(0.4) sepia(1) saturate(5) hue-rotate(200deg);" class="me-2">
+                    Лента нарушений
+                </h4>
+                <span class="badge bg-light text-dark border">Всего событий: {{ events|length }}</span>
+            </div>
+
+            <div class="table-responsive border rounded bg-white">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Время</th>
+                            <th>Студент</th>
+                            <th>Тест</th>
+                            <th>Тип нарушения</th>
+                            <th>Детали</th>
+                            <th class="text-end pe-3">Разбор</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                            <tr>
+                                <td class="ps-3 text-muted" style="font-size: 0.85rem;">
+                                    {{ event.timestamp.strftime('%d.%m %H:%M:%S') }}
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ event.attempt.student.last_name }} {{ event.attempt.student.first_name }}</div>
+                                    <small class="text-muted">{{ event.attempt.student.username }}</small>
+                                </td>
+                                <td>
+                                    <span class="d-block text-truncate" style="max-width: 200px;" title="{{ event.attempt.test.title }}">
+                                        {{ event.attempt.test.title }}
+                                    </span>
+                                    <small class="badge bg-light text-dark border" style="font-size: 0.7rem;">
+                                        {{ event.attempt.test.discipline.name if event.attempt.test.discipline else 'Общий' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if event.action_type.value == 'tab_switch' %}
+                                        <span class="badge bg-warning text-dark">Смена вкладки</span>
+                                    {% elif event.action_type.value == 'copy_paste' %}
+                                        <span class="badge bg-danger">Копирование</span>
+                                    {% elif event.action_type.value == 'mouse_leave' %}
+                                        <span class="badge bg-info text-dark">Выход курсора</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ event.action_type.value }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small text-muted">
+                                    {{ event.details if event.details else '—' }}
+                                </td>
+                                <td class="text-end pe-3">
+                                    <a href="{{url_for("attempt_details_page", attempt_id=event.attempt.id) }}" class="btn btn-sm btn-outline-primary shadow-sm">
+                                        В попытку →
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <div class="fs-2 mb-2">🛡️</div>
+                                    Пока никаких подозрительных событий не зафиксировано.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
