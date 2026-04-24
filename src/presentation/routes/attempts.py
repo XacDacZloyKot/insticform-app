@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse, RedirectResponse, JSONResponse
 
-from core.utils.auth.access_rights import get_current_teacher, get_current_admin
+from src.core.utils.auth.access_rights import get_current_teacher, get_current_admin
 from src.services.user_service import UserService
 from src.core.templates import templates
 from src.core.utils.auth.access_rights import get_current_user
