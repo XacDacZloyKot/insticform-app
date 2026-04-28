@@ -64,18 +64,15 @@
                         <span class="badge bg-light text-dark border">{{ target_user.assigned_tests|length }} шт.</span>
                     </div>
 
-                    <form action="/users/{{ target_user.id }}/assign_test" method="post"
-                          class="d-flex gap-2 mb-4 p-3 bg-light rounded border border-primary border-opacity-25">
-                        <select name="test_id" class="form-select border-secondary shadow-sm" required>
-                            <option value="" disabled selected>Выберите тест из банка...</option>
-                            {% for t in available_tests %}
-                                <option value="{{ t.id }}">{{ t.title }}
-                                    ({{ t.discipline.name if t.discipline else 'Без дисциплины' }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit" class="btn btn-primary fw-bold px-4 text-nowrap shadow-sm">Выдать</button>
-                    </form>
+                    <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded border border-primary border-opacity-25 shadow-sm">
+                        <div>
+                            <h6 class="fw-bold m-0 text-primary">Индивидуальное назначение</h6>
+                            <span class="small text-muted">Доступно тестов: {{ available_tests|length }}</span>
+                        </div>
+                        <button type="button" class="btn btn-primary fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignTestModal">
+                            Выбрать тест
+                        </button>
+                    </div>
 
                     <div class="list-group list-group-flush border rounded shadow-sm">
                         {% for test in target_user.assigned_tests %}
@@ -98,7 +95,7 @@
                         {% else %}
                             <div class="p-5 text-center text-muted bg-light rounded">
                                 Студенту пока не назначено ни одного теста.<br>
-                                Выберите тест в меню выше и нажмите «Выдать».
+                                Выберите тест в меню выше и нажмите «Выбрать тест».
                             </div>
                         {% endfor %}
                     </div>
@@ -165,4 +162,80 @@
             </div>
         {% endif %}
     </div>
+
+    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-labelledby="assignTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="assignTestModalLabel">Выбор теста для назначения</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 bg-light border-bottom">
+                        <input type="text" id="testSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по названию или дисциплине..." autofocus>
+                    </div>
+                    <div class="list-group list-group-flush" id="testList">
+                        {% for t in available_tests %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ t.title|lower }} {{ t.discipline.name|lower if t.discipline else '' }}">
+                            <div class="pe-3">
+                                <span class="fw-bold text-dark d-block">{{ t.title }}</span>
+                                <span class="badge bg-info text-dark mt-1" style="font-size: 0.75rem;">
+                                    {{ t.discipline.name if t.discipline else 'Без дисциплины' }}
+                                </span>
+                            </div>
+                            <form action="/users/{{ target_user.id }}/assign_test" method="post" class="m-0">
+                                <input type="hidden" name="test_id" value="{{ t.id }}">
+                                <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">Выдать</button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-5">
+                            Нет доступных тестов для назначения.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('testSearchInput');
+            const listItems = document.querySelectorAll('#testList .search-item');
+            const modalElement = document.getElementById('assignTestModal');
+
+            if (!searchInput || !modalElement) return;
+
+            // Фокус на поле ввода при открытии окна
+            modalElement.addEventListener('shown.bs.modal', function () {
+                searchInput.focus();
+            });
+
+            // Логика фильтрации
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+
+                listItems.forEach(item => {
+                    const searchString = item.getAttribute('data-search');
+                    if (searchString.includes(query)) {
+                        item.classList.remove('d-none');
+                        item.classList.add('d-flex');
+                    } else {
+                        item.classList.remove('d-flex');
+                        item.classList.add('d-none');
+                    }
+                });
+            });
+
+            // Очистка поиска при закрытии окна
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                searchInput.value = '';
+                listItems.forEach(item => {
+                    item.classList.remove('d-none');
+                    item.classList.add('d-flex');
+                });
+            });
+        });
+    </script>
 {% endblock %}
