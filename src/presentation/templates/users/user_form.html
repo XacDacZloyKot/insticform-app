@@ -29,19 +29,19 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold small text-secondary">Логин системы</label>
                         <input type="text" class="form-control" name="username"
-                               value="{{ target_user.username if edit_mode else '' }}" required>
+                               value="{{ target_user.username if edit_mode else '' }}" maxlength="50" required>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold small text-secondary">Фамилия</label>
                             <input type="text" class="form-control" name="last_name"
-                                   value="{{ target_user.last_name if edit_mode else '' }}" required>
+                                   value="{{ target_user.last_name if edit_mode else '' }}" maxlength="64" required>
                         </div>
                         <div class="col-md-6 mt-3 mt-md-0">
                             <label class="form-label fw-bold small text-secondary">Имя</label>
                             <input type="text" class="form-control" name="first_name"
-                                   value="{{ target_user.first_name if edit_mode else '' }}" required>
+                                   value="{{ target_user.first_name if edit_mode else '' }}" maxlength="64" required>
                         </div>
                     </div>
 
@@ -49,7 +49,7 @@
                         <label class="form-label fw-bold small text-secondary">Отчество <span
                                 class="text-muted fw-normal small">(необязательно)</span></label>
                         <input type="text" class="form-control" name="patronymic"
-                               value="{{ target_user.patronymic if edit_mode and target_user.patronymic else '' }}">
+                               value="{{ target_user.patronymic if edit_mode and target_user.patronymic else '' }}" maxlength="64">
                     </div>
 
                     {% if edit_mode %}
@@ -78,7 +78,7 @@
                         </label>
                         <input type="password" class="form-control" name="password"
                                placeholder="{% if edit_mode %}Оставьте пустым, чтобы не менять{% else %}Минимум 6 символов{% endif %}"
-                               minlength="6" {% if not edit_mode %}required{% endif %}>
+                               minlength="6" maxlength="72" {% if not edit_mode %}required{% endif %}>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
