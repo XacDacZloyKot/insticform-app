@@ -11,19 +11,13 @@
                     <div class="d-flex gap-3">
                         <a href="/users/{{ target_user.id }}/edit"
                            class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить"
-                                 style="width: 18px;">
-                            Изменить
+                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить" style="width: 18px;"> Изменить
                         </a>
                         {% if target_user.role.value != 'admin' %}
                         <form action="/users/{{ target_user.id }}/delete" method="post"
-                              onsubmit="return confirm('Вы уверены, что хотите удалить этого пользователя?');"
-                              class="m-0">
-                            <button type="submit"
-                                    class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить"
-                                     style="width: 18px;">
-                                Удалить
+                              onsubmit="return confirm('Вы уверены, что хотите удалить этого пользователя?');" class="m-0">
+                            <button type="submit" class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить" style="width: 18px;"> Удалить
                             </button>
                         </form>
                         {% endif %}
@@ -32,26 +26,12 @@
 
                 <table class="table table-borderless">
                     <tbody>
-                    <tr>
-                        <td class="text-muted" style="width: 120px;">ID:</td>
-                        <td class="fw-bold">#{{ target_user.id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">ФИО:</td>
-                        <td class="fw-bold">{{ target_user.last_name }} {{ target_user.first_name }}
-                            {% if target_user.patronymic %}{{ target_user.patronymic }}{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Логин:</td>
-                        <td><code>{{ target_user.username }}</code></td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Роль:</td>
-                        <td><span class="badge bg-secondary">{{ target_user.role.value | upper }}</span></td>
-                    </tr>
+                    <tr><td class="text-muted" style="width: 120px;">ID:</td><td class="fw-bold">#{{ target_user.id }}</td></tr>
+                    <tr><td class="text-muted">ФИО:</td><td class="fw-bold">{{ target_user.last_name }} {{ target_user.first_name }} {% if target_user.patronymic %}{{ target_user.patronymic }}{% endif %}</td></tr>
+                    <tr><td class="text-muted">Логин:</td><td><code>{{ target_user.username }}</code></td></tr>
+                    <tr><td class="text-muted">Роль:</td><td><span class="badge bg-secondary">{{ target_user.role.value | upper }}</span></td></tr>
                     </tbody>
                 </table>
-
                 <a href="/users" class="btn btn-outline-secondary mt-auto w-100 fw-bold">Вернуться к списку</a>
             </div>
         </div>
@@ -84,12 +64,8 @@
                                         <i class="bi bi-clock"></i> {{ test.time_limit_minutes ~ ' мин.' if test.time_limit_minutes else 'Без лимита' }}
                                     </small>
                                 </div>
-                                <form action="/users/{{ target_user.id }}/unassign_test/{{ test.id }}" method="post"
-                                      class="m-0"
-                                      onsubmit="return confirm('Забрать доступ к этому тесту у студента?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 px-2 fs-5"
-                                            title="Удалить">✖
-                                    </button>
+                                <form action="/users/{{ target_user.id }}/unassign_test/{{ test.id }}" method="post" class="m-0" onsubmit="return confirm('Забрать доступ к этому тесту у студента?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 px-2 fs-5" title="Удалить">✖</button>
                                 </form>
                             </div>
                         {% else %}
@@ -163,16 +139,16 @@
         {% endif %}
     </div>
 
-    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-labelledby="assignTestModalLabel" aria-hidden="true">
+    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold" id="assignTestModalLabel">Выбор теста для назначения</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">Выбор теста для назначения</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div class="p-3 bg-light border-bottom">
-                        <input type="text" id="testSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по названию или дисциплине..." autofocus>
+                        <input type="text" id="testSearchInput" class="form-control shadow-sm" placeholder="Поиск по названию или дисциплине..." autofocus>
                     </div>
                     <div class="list-group list-group-flush" id="testList">
                         {% for t in available_tests %}
@@ -207,12 +183,10 @@
 
             if (!searchInput || !modalElement) return;
 
-            // Фокус на поле ввода при открытии окна
             modalElement.addEventListener('shown.bs.modal', function () {
                 searchInput.focus();
             });
 
-            // Логика фильтрации
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
 
@@ -228,7 +202,6 @@
                 });
             });
 
-            // Очистка поиска при закрытии окна
             modalElement.addEventListener('hidden.bs.modal', function () {
                 searchInput.value = '';
                 listItems.forEach(item => {

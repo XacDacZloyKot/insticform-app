@@ -8,25 +8,16 @@
             <div class="card card-custom p-4 shadow-sm border-0">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold text-primary m-0">
-                        <img src="{{ url_for('static', path='/img/Book.svg') }}" alt="Дисциплина" style="width: 24px;"
-                             class="me-2">
+                        <img src="{{ url_for('static', path='/img/Book.svg') }}" alt="Дисциплина" style="width: 24px;" class="me-2">
                         {{ discipline.name }}
                     </h4>
                     <div class="d-flex gap-3">
-                        <a href="/academic/disciplines/{{ discipline.id }}/edit"
-                           class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить"
-                                 style="width: 18px;">
-                            Изменить
+                        <a href="/academic/disciplines/{{ discipline.id }}/edit" class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить" style="width: 18px;"> Изменить
                         </a>
-                        <form action="/academic/disciplines/{{ discipline.id }}/delete" method="post"
-                              onsubmit="return confirm('Вы уверены, что хотите удалить эту дисциплину? Удаление приведет к потере всех связанных с ней тестов.');"
-                              class="m-0">
-                            <button type="submit"
-                                    class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить"
-                                     style="width: 18px;">
-                                Удалить
+                        <form action="/academic/disciplines/{{ discipline.id }}/delete" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить эту дисциплину? Удаление приведет к потере всех связанных с ней тестов.');" class="m-0">
+                            <button type="submit" class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить" style="width: 18px;"> Удалить
                             </button>
                         </form>
                     </div>
@@ -34,14 +25,8 @@
 
                 <table class="table table-borderless mb-0">
                     <tbody>
-                    <tr>
-                        <td class="text-muted" style="width: 130px;">Внутренний ID:</td>
-                        <td class="fw-bold text-secondary">#{{ discipline.id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Название:</td>
-                        <td class="fw-bold fs-5">{{ discipline.name }}</td>
-                    </tr>
+                    <tr><td class="text-muted" style="width: 130px;">Внутренний ID:</td><td class="fw-bold text-secondary">#{{ discipline.id }}</td></tr>
+                    <tr><td class="text-muted">Название:</td><td class="fw-bold fs-5">{{ discipline.name }}</td></tr>
                     </tbody>
                 </table>
 
@@ -58,62 +43,47 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold m-0">Закрепленные преподаватели ({{ discipline.teachers|length }})</h5>
-
-                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                        + Назначить
-                    </button>
+                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">+ Назначить</button>
                 </div>
 
                 <div class="table-responsive border rounded bg-white">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th class="ps-3">ФИО</th>
-                            <th>Логин</th>
-                            <th class="text-end pe-3">Снять</th>
-                        </tr>
-                        </thead>
+                        <thead class="table-light"><tr><th class="ps-3">ФИО</th><th>Логин</th><th class="text-end pe-3">Снять</th></tr></thead>
                         <tbody>
                         {% for teacher in discipline.teachers %}
                             <tr>
                                 <td class="ps-3 fw-bold">{{ teacher.last_name }} {{ teacher.first_name }}</td>
                                 <td><code>{{ teacher.username }}</code></td>
                                 <td class="text-end pe-3">
-                                    <form action="/academic/disciplines/{{ discipline.id }}/remove_teacher/{{ teacher.id }}"
-                                          method="post" class="m-0"
-                                          onsubmit="return confirm('Снять преподавателя с дисциплины?');">
+                                    <form action="/academic/disciplines/{{ discipline.id }}/remove_teacher/{{ teacher.id }}" method="post" class="m-0" onsubmit="return confirm('Снять преподавателя с дисциплины?');">
                                         <button type="submit" class="btn btn-sm btn-light border text-danger" title="Снять назначение">
-                                            <img src="{{ url_for('static', path='/img/delete.svg') }}"
-                                                 style="width: 14px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(340deg);">
+                                            <img src="{{ url_for('static', path='/img/delete.svg') }}" style="width: 14px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(340deg);">
                                         </button>
                                     </form>
                                 </td>
                             </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center py-3 text-muted">Преподаватели еще не назначены.</td>
-                            </tr>
+                            <tr><td colspan="3" class="text-center py-3 text-muted">Преподаватели еще не назначены.</td></tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
-                <a href="/academic/disciplines" class="btn btn-outline-secondary mt-4 w-100 fw-bold">Вернуться к списку
-                    дисциплин</a>
+                <a href="/academic/disciplines" class="btn btn-outline-secondary mt-4 w-100 fw-bold">Вернуться к списку дисциплин</a>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="addTeacherModalLabel">Назначение преподавателя</h5>
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">Назначение преподавателя</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <div class="p-3 border-bottom bg-light">
-                        <input type="text" id="teacherSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по ФИО или логину..." autofocus>
+                    <div class="p-3 bg-light border-bottom">
+                        <input type="text" id="teacherSearchInput" class="form-control shadow-sm" placeholder="Поиск по ФИО или логину..." autofocus>
                     </div>
 
                     <div class="list-group list-group-flush" id="teacherList">
@@ -125,12 +95,12 @@
                                 </div>
                                 <form action="/academic/disciplines/{{ discipline.id }}/add_teacher" method="post" class="m-0">
                                     <input type="hidden" name="teacher_id" value="{{ t.id }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-bold">Назначить</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary fw-bold px-3">Назначить</button>
                                 </form>
                             </div>
                         {% else %}
                             <div class="text-center text-muted py-5">
-                                Все зарегистрированные преподаватели уже назначены на эту дисциплину или преподавателей нет в системе.
+                                Все зарегистрированные преподаватели уже назначены.
                             </div>
                         {% endfor %}
                     </div>
@@ -141,46 +111,30 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            function setupModalSearch(inputId, listId, modalId) {
-                const searchInput = document.getElementById(inputId);
-                const listItems = document.querySelectorAll(`#${listId} .search-item`);
-                const modalElement = document.getElementById(modalId);
+            const searchInput = document.getElementById('teacherSearchInput');
+            const listItems = document.querySelectorAll('#teacherList .search-item');
+            const modalElement = document.getElementById('addTeacherModal');
 
-                if (!searchInput || !modalElement) return;
+            if (!searchInput || !modalElement) return;
 
-                // Ставим фокус на поле ввода при открытии окна
-                modalElement.addEventListener('shown.bs.modal', function () {
-                    searchInput.focus();
+            modalElement.addEventListener('shown.bs.modal', () => searchInput.focus());
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                listItems.forEach(item => {
+                    const searchString = item.getAttribute('data-search');
+                    item.classList.toggle('d-none', !searchString.includes(query));
+                    item.classList.toggle('d-flex', searchString.includes(query));
                 });
+            });
 
-                // Обрабатываем ввод текста
-                searchInput.addEventListener('input', function() {
-                    const query = this.value.toLowerCase().trim();
-
-                    listItems.forEach(item => {
-                        const searchString = item.getAttribute('data-search');
-                        if (searchString.includes(query)) {
-                            item.classList.remove('d-none');
-                            item.classList.add('d-flex');
-                        } else {
-                            item.classList.remove('d-flex');
-                            item.classList.add('d-none');
-                        }
-                    });
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                searchInput.value = '';
+                listItems.forEach(item => {
+                    item.classList.remove('d-none');
+                    item.classList.add('d-flex');
                 });
-
-                // Очищаем поиск при закрытии окна
-                modalElement.addEventListener('hidden.bs.modal', function () {
-                    searchInput.value = '';
-                    listItems.forEach(item => {
-                        item.classList.remove('d-none');
-                        item.classList.add('d-flex');
-                    });
-                });
-            }
-
-            // Инициализируем поиск для преподавателей
-            setupModalSearch('teacherSearchInput', 'teacherList', 'addTeacherModal');
+            });
         });
     </script>
 {% endblock %}

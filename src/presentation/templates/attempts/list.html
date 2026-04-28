@@ -64,7 +64,7 @@
                                 <td class="fw-bold text-primary">{{ attempt.total_score|round(2) if attempt.total_score is not none else '—' }}</td>
                                 <td class="small text-muted">{{ attempt.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
                                 <td class="text-end pe-3">
-                                    <a href="/attempts/{{ attempt.id }}" class="btn btn-sm btn-outline-primary fw-bold">Детали</a>
+                                    <a href="/attempts/{{ attempt.id }}/details" class="btn btn-sm btn-outline-primary fw-bold">Детали</a>
                                 </td>
                             </tr>
                         {% else %}
@@ -80,7 +80,7 @@
 <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header">
+            <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold text-primary">Параметры поиска</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -158,9 +158,9 @@
 <div class="modal fade picker-submodal" id="{{ id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow">
-            <div class="modal-header bg-primary text-white">
-                <h6 class="modal-title fw-bold">{{ title }}</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-toggle="modal" data-bs-target="#filterModal"></button>
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#filterModal"></button>
             </div>
             <div class="p-2 border-bottom">
                 <input type="text" class="form-control form-control-sm picker-search" placeholder="Поиск...">

@@ -9,20 +9,12 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="fw-bold text-primary m-0">Группа: {{ group.name }}</h4>
                     <div class="d-flex gap-3">
-                        <a href="/academic/groups/{{ group.id }}/edit"
-                           class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить"
-                                 style="width: 18px;">
-                            Изменить
+                        <a href="/academic/groups/{{ group.id }}/edit" class="btn btn-outline-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                            <img src="{{ url_for('static', path='/img/Redact.svg') }}" alt="Изменить" style="width: 18px;"> Изменить
                         </a>
-                        <form action="/academic/groups/{{ group.id }}/delete" method="post"
-                              onsubmit="return confirm('Вы уверены, что хотите удалить эту группу? Это действие нельзя отменить.');"
-                              class="m-0">
-                            <button type="submit"
-                                    class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
-                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить"
-                                     style="width: 18px;">
-                                Удалить
+                        <form action="/academic/groups/{{ group.id }}/delete" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить эту группу? Это действие нельзя отменить.');" class="m-0">
+                            <button type="submit" class="btn btn-outline-danger d-flex align-items-center gap-2 px-3 fw-bold shadow-sm rounded-3">
+                                <img src="{{ url_for('static', path='/img/delete.svg') }}" alt="Удалить" style="width: 18px;"> Удалить
                             </button>
                         </form>
                     </div>
@@ -30,14 +22,8 @@
 
                 <table class="table table-borderless">
                     <tbody>
-                    <tr>
-                        <td class="text-muted" style="width: 150px;">Внутренний ID:</td>
-                        <td class="fw-bold">#{{ group.id }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Название:</td>
-                        <td class="fw-bold fs-5">{{ group.name }}</td>
-                    </tr>
+                    <tr><td class="text-muted" style="width: 150px;">Внутренний ID:</td><td class="fw-bold">#{{ group.id }}</td></tr>
+                    <tr><td class="text-muted">Название:</td><td class="fw-bold fs-5">{{ group.name }}</td></tr>
                     </tbody>
                 </table>
 
@@ -45,43 +31,27 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold m-0">Студенты в группе ({{ group.students|length }})</h5>
-
-                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                        + Добавить студента
-                    </button>
+                    <button type="button" class="btn btn-sm btn-primary fw-bold px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">+ Добавить студента</button>
                 </div>
 
                 <div class="table-responsive border rounded bg-white">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th class="ps-3">ФИО</th>
-                            <th>Логин</th>
-                            <th class="text-end pe-3">Открепить</th>
-                        </tr>
-                        </thead>
+                        <thead class="table-light"><tr><th class="ps-3">ФИО</th><th>Логин</th><th class="text-end pe-3">Открепить</th></tr></thead>
                         <tbody>
                         {% for student in group.students %}
                             <tr>
                                 <td class="ps-3 fw-bold">{{ student.last_name }} {{ student.first_name }}</td>
                                 <td><code>{{ student.username }}</code></td>
                                 <td class="text-end pe-3">
-                                    <form action="/academic/groups/{{ group.id }}/remove_student/{{ student.id }}"
-                                          method="post" class="m-0"
-                                          onsubmit="return confirm('Открепить студента от группы?');">
-                                        <button type="submit" class="btn btn-sm btn-light border text-danger"
-                                                title="Открепить">
-                                            <img src="{{ url_for('static', path='/img/delete.svg') }}"
-                                                 style="width: 14px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(340deg);">
+                                    <form action="/academic/groups/{{ group.id }}/remove_student/{{ student.id }}" method="post" class="m-0" onsubmit="return confirm('Открепить студента от группы?');">
+                                        <button type="submit" class="btn btn-sm btn-light border text-danger" title="Открепить">
+                                            <img src="{{ url_for('static', path='/img/delete.svg') }}" style="width: 14px; filter: invert(30%) sepia(90%) saturate(3000%) hue-rotate(340deg);">
                                         </button>
                                     </form>
                                 </td>
                             </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="3" class="text-center py-3 text-muted">В этой группе пока нет студентов.
-                                </td>
-                            </tr>
+                            <tr><td colspan="3" class="text-center py-3 text-muted">В этой группе пока нет студентов.</td></tr>
                         {% endfor %}
                         </tbody>
                     </table>
@@ -95,47 +65,36 @@
                             <h5 class="fw-bold m-0 text-primary">Назначить тест группе</h5>
                             <span class="small text-muted">Доступно тестов для выдачи: {{ available_tests|length }}</span>
                         </div>
-                        <button type="button" class="btn btn-primary fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignTestModal">
-                            Выбрать тест
-                        </button>
+                        <button type="button" class="btn btn-primary fw-bold px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#assignTestModal">Выбрать тест</button>
                     </div>
                 </div>
-
-                <hr class="text-muted my-4">
-
                 <a href="/academic/groups" class="btn btn-outline-secondary mt-4 w-100">Вернуться к списку групп</a>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="addStudentModalLabel">Добавление студента в группу</h5>
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">Добавление студента в группу</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div class="p-3 border-bottom bg-light">
                         <input type="text" id="studentSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по ФИО или логину..." autofocus>
                     </div>
-
                     <div class="list-group list-group-flush" id="studentList">
                         {% for s in available_students %}
                             <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ s.last_name|lower }} {{ s.first_name|lower }} {{ s.username|lower }}">
-                                <div>
-                                    <span class="fw-bold text-dark">{{ s.last_name }} {{ s.first_name }}</span><br>
-                                    <small class="text-muted">{{ s.username }}</small>
-                                </div>
+                                <div><span class="fw-bold text-dark">{{ s.last_name }} {{ s.first_name }}</span><br><small class="text-muted">{{ s.username }}</small></div>
                                 <form action="/academic/groups/{{ group.id }}/add_student" method="post" class="m-0">
                                     <input type="hidden" name="student_id" value="{{ s.id }}">
                                     <button type="submit" class="btn btn-sm btn-outline-primary fw-bold">Добавить</button>
                                 </form>
                             </div>
                         {% else %}
-                            <div class="text-center text-muted py-5">
-                                Все зарегистрированные студенты уже состоят в этой группе.
-                            </div>
+                            <div class="text-center text-muted py-5">Все зарегистрированные студенты уже состоят в этой группе.</div>
                         {% endfor %}
                     </div>
                 </div>
@@ -143,26 +102,23 @@
         </div>
     </div>
 
-    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-labelledby="assignTestModalLabel" aria-hidden="true">
+    <div class="modal fade" id="assignTestModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold" id="assignTestModalLabel">Выбор теста для назначения</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">Выбор теста для назначения</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div class="p-3 border-bottom bg-light">
                         <input type="text" id="testSearchInput" class="form-control form-control-lg shadow-sm" placeholder="Поиск по названию или дисциплине...">
                     </div>
-
                     <div class="list-group list-group-flush" id="testList">
                         {% for t in available_tests %}
                             <div class="list-group-item d-flex justify-content-between align-items-center search-item py-3" data-search="{{ t.title|lower }} {{ t.discipline.name|lower if t.discipline else '' }}">
                                 <div class="pe-3">
                                     <span class="fw-bold text-dark d-block">{{ t.title }}</span>
-                                    <span class="badge bg-info text-dark mt-1" style="font-size: 0.75rem;">
-                                        {{ t.discipline.name if t.discipline else 'Без дисциплины' }}
-                                    </span>
+                                    <span class="badge bg-info text-dark mt-1" style="font-size: 0.75rem;">{{ t.discipline.name if t.discipline else 'Без дисциплины' }}</span>
                                 </div>
                                 <form action="/academic/groups/{{ group.id }}/assign_test" method="post" class="m-0">
                                     <input type="hidden" name="test_id" value="{{ t.id }}">
@@ -170,9 +126,7 @@
                                 </form>
                             </div>
                         {% else %}
-                            <div class="text-center text-muted py-5">
-                                Нет доступных тестов для назначения.
-                            </div>
+                            <div class="text-center text-muted py-5">Нет доступных тестов для назначения.</div>
                         {% endfor %}
                     </div>
                 </div>
@@ -182,29 +136,17 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-
-            // Функция, которая настраивает поиск для любого модального окна
             function setupModalSearch(inputId, listId, modalId) {
                 const searchInput = document.getElementById(inputId);
                 const listItems = document.querySelectorAll(`#${listId} .search-item`);
                 const modalElement = document.getElementById(modalId);
-
                 if (!searchInput || !modalElement) return;
 
-                // Ставим фокус на поле ввода при открытии окна
-                modalElement.addEventListener('shown.bs.modal', function () {
-                    searchInput.focus();
-                });
-
-                // Обрабатываем ввод текста
+                modalElement.addEventListener('shown.bs.modal', function () { searchInput.focus(); });
                 searchInput.addEventListener('input', function() {
                     const query = this.value.toLowerCase().trim();
-
                     listItems.forEach(item => {
-                        // Берем строку для поиска из атрибута data-search
                         const searchString = item.getAttribute('data-search');
-
-                        // Если находим совпадение, показываем элемент, иначе скрываем
                         if (searchString.includes(query)) {
                             item.classList.remove('d-none');
                             item.classList.add('d-flex');
@@ -214,8 +156,6 @@
                         }
                     });
                 });
-
-                // Очищаем поиск при закрытии окна
                 modalElement.addEventListener('hidden.bs.modal', function () {
                     searchInput.value = '';
                     listItems.forEach(item => {
@@ -224,7 +164,6 @@
                     });
                 });
             }
-
             setupModalSearch('studentSearchInput', 'studentList', 'addStudentModal');
             setupModalSearch('testSearchInput', 'testList', 'assignTestModal');
         });
