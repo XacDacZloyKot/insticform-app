@@ -6,11 +6,23 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="card card-custom p-4 shadow-sm border-0">
-            <h4 class="fw-bold text-primary mb-4">
-                <img src="{{ url_for('static', path='/img/Results.svg') }}" alt="Результаты" style="width: 28px;" class="me-2">
-                История попыток студентов
-            </h4>
+        <div class="card card-custom p-4 shadow-sm border-0 mb-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-primary m-0 d-flex align-items-center">
+                    <img src="{{ url_for('static', path='/img/Results.svg') }}" alt="Результаты" style="width: 28px;" class="me-2">
+                    История попыток студентов
+                </h4>
+
+                <div class="d-flex gap-2">
+                    {% if has_active_filters %}
+                        <a href="/attempts" class="btn btn-outline-danger fw-bold shadow-sm">✖ Сбросить</a>
+                    {% endif %}
+                    <button class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <img src="{{ url_for('static', path='/img/Redact.svg') }}" style="width: 16px; filter: brightness(0) invert(1);"> Фильтры
+                    </button>
+                </div>
+            </div>
 
             <div class="table-responsive border rounded bg-white">
                 <table class="table table-hover align-middle mb-0">
@@ -30,10 +42,13 @@
                         {% for attempt in attempts %}
                             <tr>
                                 <td class="ps-3 fw-bold text-muted">#{{ attempt.id }}</td>
-                                <td class="fw-bold">{{ attempt.student.last_name }} {{ attempt.student.first_name }}</td>
-                                <td>{{ attempt.test.title }}</td>
                                 <td>
-                                    <span class="badge bg-light text-dark border">
+                                    <div class="fw-bold text-dark">{{ attempt.student.last_name }} {{ attempt.student.first_name }}</div>
+                                    <small class="text-muted">{{ attempt.student.username }}</small>
+                                </td>
+                                <td class="small">{{ attempt.test.title }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border fw-normal">
                                         {{ attempt.test.discipline.name if attempt.test.discipline else 'Общий' }}
                                     </span>
                                 </td>
@@ -43,29 +58,17 @@
                                     {% elif attempt.status.value == 'in_progress' %}
                                         <span class="badge bg-warning text-dark">В процессе</span>
                                     {% else %}
-                                        <span class="badge bg-info text-dark">Ожидает проверки</span>
+                                        <span class="badge bg-info text-dark">Ожидает</span>
                                     {% endif %}
                                 </td>
-                                <td class="fw-bold">
-                                    {% if attempt.total_score is not none %}
-                                        {{ attempt.total_score|round(2) }}
-                                    {% else %}
-                                        <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ attempt.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
+                                <td class="fw-bold text-primary">{{ attempt.total_score|round(2) if attempt.total_score is not none else '—' }}</td>
+                                <td class="small text-muted">{{ attempt.start_time.strftime('%d.%m.%Y %H:%M') }}</td>
                                 <td class="text-end pe-3">
-                                    <a href="{{url_for("attempt_details_page", attempt_id=attempt.id) }}" class="btn btn-sm btn-outline-primary fw-bold">
-                                        Детали
-                                    </a>
+                                    <a href="/attempts/{{ attempt.id }}" class="btn btn-sm btn-outline-primary fw-bold">Детали</a>
                                 </td>
                             </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    В системе пока нет зарегистрированных попыток сдачи тестов.
-                                </td>
-                            </tr>
+                            <tr><td colspan="8" class="text-center py-5 text-muted fst-italic">Ничего не найдено</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -73,4 +76,185 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-primary">Параметры поиска</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/attempts" method="get" id="mainFilterForm">
+                <div class="modal-body">
+                    <input type="hidden" name="student_id" id="f_student_id" value="{{ filters.student_id or '' }}">
+                    <input type="hidden" name="group_id" id="f_group_id" value="{{ filters.group_id or '' }}">
+                    <input type="hidden" name="teacher_id" id="f_teacher_id" value="{{ filters.teacher_id or '' }}">
+                    <input type="hidden" name="discipline_id" id="f_discipline_id" value="{{ filters.discipline_id or '' }}">
+                    <input type="hidden" name="test_id" id="f_test_id" value="{{ filters.test_id or '' }}">
+
+                    <div class="row g-3">
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Студент</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="display_student" readonly placeholder="Все студенты" value="">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickStudentModal">Выбрать</button>
+                            </div>
+                        </div>
+
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Учебная группа</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="display_group" readonly placeholder="Все группы">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickGroupModal">Выбрать</button>
+                            </div>
+                        </div>
+
+                        {% if user.role.value == 'admin' %}
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Преподаватель</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="display_teacher" readonly placeholder="Все преподаватели">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickTeacherModal">Выбрать</button>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Дисциплина</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="display_discipline" readonly placeholder="Все дисциплины">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickDisciplineModal">Выбрать</button>
+                            </div>
+                        </div>
+
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Тест</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="display_test" readonly placeholder="Все тесты">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickTestModal">Выбрать</button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Дата от</label>
+                            <input type="date" name="date_from" class="form-control" value="{{ filters.date_from or '' }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Дата до</label>
+                            <input type="date" name="date_to" class="form-control" value="{{ filters.date_to or '' }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary fw-bold" onclick="resetPickers()">Очистить</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Применить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% macro render_picker(id, title, items, search_attr) %}
+<div class="modal fade picker-submodal" id="{{ id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary text-white">
+                <h6 class="modal-title fw-bold">{{ title }}</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-toggle="modal" data-bs-target="#filterModal"></button>
+            </div>
+            <div class="p-2 border-bottom">
+                <input type="text" class="form-control form-control-sm picker-search" placeholder="Поиск...">
+            </div>
+            <div class="list-group list-group-flush" style="max-height: 400px;">
+                {% for item in items %}
+                    <button type="button" class="list-group-item list-group-item-action py-2 search-item"
+                            data-id="{{ item.id }}"
+                            data-name="{{ item.last_name ~ ' ' ~ item.first_name if 'last_name' in item.__dict__ else item.title if 'title' in item.__dict__ else item.name }}"
+                            data-search="{{ (item.last_name|lower ~ ' ' ~ item.first_name|lower ~ ' ' ~ item.username|lower) if 'last_name' in item.__dict__ else (item.title|lower if 'title' in item.__dict__ else item.name|lower) }}">
+                        <div class="fw-bold small">{{ item.last_name ~ ' ' ~ item.first_name if 'last_name' in item.__dict__ else item.title if 'title' in item.__dict__ else item.name }}</div>
+                        {% if 'username' in item.__dict__ %}<small class="text-muted">{{ item.username }}</small>{% endif %}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{{ render_picker('pickStudentModal', 'Выбор студента', students) }}
+{{ render_picker('pickGroupModal', 'Выбор группы', groups) }}
+{{ render_picker('pickTeacherModal', 'Выбор преподавателя', teachers) }}
+{{ render_picker('pickDisciplineModal', 'Выбор дисциплины', disciplines) }}
+{{ render_picker('pickTestModal', 'Выбор теста', tests) }}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterForm = document.getElementById('mainFilterForm');
+
+    filterForm.addEventListener('submit', function() {
+        const inputs = filterForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (!input.value) {
+                input.disabled = true;
+            }
+        });
+    });
+
+    const pickers = [
+        { modal: 'pickStudentModal', hidden: 'f_student_id', display: 'display_student' },
+        { modal: 'pickGroupModal', hidden: 'f_group_id', display: 'display_group' },
+        { modal: 'pickTeacherModal', hidden: 'f_teacher_id', display: 'display_teacher' },
+        { modal: 'pickDisciplineModal', hidden: 'f_discipline_id', display: 'display_discipline' },
+        { modal: 'pickTestModal', hidden: 'f_test_id', display: 'display_test' }
+    ];
+
+    pickers.forEach(p => {
+        const modalEl = document.getElementById(p.modal);
+        if (!modalEl) return;
+
+        // Поиск внутри подборщика
+        const searchInput = modalEl.querySelector('.picker-search');
+        const items = modalEl.querySelectorAll('.search-item');
+
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            items.forEach(item => {
+                const text = item.getAttribute('data-search');
+                item.classList.toggle('d-none', !text.includes(q));
+            });
+        });
+
+        // Обработка клика по элементу
+        items.forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                document.getElementById(p.hidden).value = id;
+                document.getElementById(p.display).value = name;
+
+                // Закрываем текущее и возвращаемся в фильтры
+                bootstrap.Modal.getInstance(modalEl).hide();
+                new bootstrap.Modal(document.getElementById('filterModal')).show();
+            });
+        });
+    });
+});
+
+function resetPickers() {
+    const fields = ['student_id', 'group_id', 'teacher_id', 'discipline_id', 'test_id'];
+    fields.forEach(f => {
+        const hidden = document.getElementById('f_' + f);
+        const display = document.getElementById('display_' + f.split('_')[0]);
+        if (hidden) hidden.value = '';
+        if (display) display.value = '';
+    });
+}
+</script>
+
+<style>
+    .picker-row .form-control { cursor: default; }
+    .picker-submodal .list-group-item { cursor: pointer; border-left: none; border-right: none; }
+    .picker-submodal .list-group-item:hover { background-color: #f8f9fa; }
+</style>
 {% endblock %}

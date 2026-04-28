@@ -1,9 +1,13 @@
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import selectinload
 
+from src.model.domain.academic import Discipline
 from src.model.domain.attempt import StudentAnswer
 from src.model.domain.attempt import TestAttempt, ProctoringEvent
 from src.model.domain.enums import AttemptStatus, ProctoringAction
 from src.model.domain.test import Test, Question
+from src.model.domain.user import User
 from src.repositories.attempt_repository import AttemptRepository, ProctoringRepository
 
 
@@ -120,16 +124,22 @@ class AttemptService:
         await self.attempt_repo.delete(attempt_id)
         return student_id
 
-    async def list_attempts_for_staff(self, user) -> list[TestAttempt]:
-        """
-        Возвращает список попыток в зависимости от роли:
-        Админ видит все попытки.
-        Преподаватель видит попытки по своим дисциплинам и созданным тестам.
-        """
+    async def list_attempts_for_staff(
+            self, user,
+            student_id: int = None,
+            test_id: int = None,
+            discipline_id: int = None,
+            teacher_id: int = None,
+            group_id: int = None,
+            date_from: str = None,
+            date_to: str = None
+    ) -> list[TestAttempt]:
+        """Возвращает список попыток с учетом прав доступа и расширенных фильтров."""
         joins = [
-            selectinload(TestAttempt.student),
-            selectinload(TestAttempt.test).selectinload(Test.discipline)
+            selectinload(TestAttempt.student).selectinload(User.groups),
+            selectinload(TestAttempt.test).selectinload(Test.discipline).selectinload(Discipline.teachers)
         ]
+
         all_attempts = await self.attempt_repo.list_with_joins(
             joins=joins,
             order_by="start_time",
@@ -137,13 +147,35 @@ class AttemptService:
         )
 
         if user.role.value == 'admin':
-            return all_attempts
+            filtered_attempts = all_attempts
+        else:
+            teacher_discipline_ids = [d.id for d in getattr(user, 'taught_disciplines', [])]
+            filtered_attempts = [
+                a for a in all_attempts
+                if a.test.discipline_id in teacher_discipline_ids or a.test.creator_id == user.id
+            ]
 
-        teacher_discipline_ids = [d.id for d in getattr(user, 'taught_disciplines', [])]
-        filtered_attempts = [
-            a for a in all_attempts
-            if a.test.discipline_id in teacher_discipline_ids or a.test.creator_id == user.id
-        ]
+        if student_id:
+            filtered_attempts = [a for a in filtered_attempts if a.student_id == student_id]
+        if test_id:
+            filtered_attempts = [a for a in filtered_attempts if a.test_id == test_id]
+        if discipline_id:
+            filtered_attempts = [a for a in filtered_attempts if a.test.discipline_id == discipline_id]
+        if group_id:
+            filtered_attempts = [a for a in filtered_attempts if group_id in [g.id for g in a.student.groups]]
+        if teacher_id:
+            filtered_attempts = [
+                a for a in filtered_attempts
+                if a.test.creator_id == teacher_id or (
+                        a.test.discipline and teacher_id in [t.id for t in a.test.discipline.teachers]
+                )
+            ]
+        if date_from:
+            df = datetime.strptime(date_from, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            filtered_attempts = [a for a in filtered_attempts if a.start_time >= df]
+        if date_to:
+            dt = datetime.strptime(date_to, "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=23, minute=59, second=59)
+            filtered_attempts = [a for a in filtered_attempts if a.start_time <= dt]
 
         return filtered_attempts
 
