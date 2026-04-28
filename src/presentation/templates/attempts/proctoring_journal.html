@@ -8,11 +8,24 @@
     <div class="col-12">
         <div class="card card-custom p-4 shadow-sm border-0">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold text-primary m-0">
+                <h4 class="fw-bold text-primary m-0 d-flex align-items-center">
                     <img src="{{ url_for('static', path='/img/Info.svg') }}" style="width: 24px; filter: invert(0.4) sepia(1) saturate(5) hue-rotate(200deg);" class="me-2">
                     Лента нарушений
                 </h4>
-                <span class="badge bg-light text-dark border">Всего событий: {{ events|length }}</span>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-light text-dark border">Всего событий: {{ events|length }}</span>
+
+                    {% if user.role.value == 'admin' and events|length > 0 %}
+                        <form action="/attempts/proctoring/journal/clear" method="post" class="m-0"
+                              onsubmit="return confirm('Вы уверены, что хотите безвозвратно удалить все записи из журнала прокторинга?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold shadow-sm d-flex align-items-center gap-1">
+                                <img src="{{ url_for('static', path='/img/delete.svg') }}" style="width: 14px;" alt="Удалить">
+                                Очистить журнал
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="table-responsive border rounded bg-white">

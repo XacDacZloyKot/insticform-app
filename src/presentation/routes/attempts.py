@@ -270,3 +270,12 @@ async def my_results_page(
         "user": current_user,
         "attempts": attempts
     })
+
+@router.post("/proctoring/journal/clear")
+async def clear_global_proctoring_journal(
+        attempt_service: AttemptService = Depends(get_attempt_service),
+        current_user: User = Depends(get_current_admin)
+):
+    """Полная очистка глобального журнала прокторинга (доступно только админу)."""
+    await attempt_service.clear_all_proctoring_logs(current_user)
+    return RedirectResponse(url="/attempts/proctoring/journal", status_code=status.HTTP_303_SEE_OTHER)

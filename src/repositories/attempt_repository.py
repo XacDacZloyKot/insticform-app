@@ -29,6 +29,12 @@ class ProctoringRepository(BaseRepository[ProctoringEvent]):
         await self._session.execute(stmt)
         await self._session.flush()
 
+    async def clear_all(self) -> None:
+        """Удаляет вообще все события прокторинга из базы данных."""
+        stmt = delete(self.model)
+        await self._session.execute(stmt)
+        await self._session.flush()
+
 
 class StudentAnswerRepository(BaseRepository[StudentAnswer]):
     def __init__(self, session: AsyncSession):

@@ -203,3 +203,9 @@ class AttemptService:
             e for e in all_events
             if e.attempt.test.discipline_id in teacher_discipline_ids or e.attempt.test.creator_id == user.id
         ]
+
+    async def clear_all_proctoring_logs(self, user: User) -> None:
+        """Полностью очищает глобальный журнал прокторинга (только для администраторов)."""
+        if user.role.value != 'admin':
+            raise ValueError("Только администратор имеет право на полную очистку журнала.")
+        await self.proctoring_repo.clear_all()
