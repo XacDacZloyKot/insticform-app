@@ -12,28 +12,20 @@
                     <img src="{{ url_for('static', path='/img/Tests.svg') }}" style="width: 28px;" class="me-2" alt="Тесты">
                     Банк тестов
                 </h4>
-                <a href="/tests/create" class="btn btn-primary fw-bold shadow-sm">
-                    + Создать тест
-                </a>
-            </div>
 
-            <div class="bg-light p-3 rounded border mb-4">
-                <form action="/tests" method="get" class="row g-3 align-items-end">
-                    <div class="col-md-5 col-lg-4">
-                        <label class="form-label fw-bold small text-secondary mb-1">Фильтр по дисциплине</label>
-                        <select name="discipline_id" class="form-select shadow-sm" onchange="if(this.value) { this.form.submit(); } else { window.location.href='/tests'; }">
-                            <option value="">-- Все доступные дисциплины --</option>
-                            {% for d in disciplines %}
-                                <option value="{{ d.id }}" {% if selected_discipline_id == d.id %}selected{% endif %}>
-                                    {{ d.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 col-lg-2">
-                        <a href="/tests" class="btn btn-outline-secondary w-100 shadow-sm">Сбросить фильтр</a>
-                    </div>
-                </form>
+                <div class="d-flex gap-2">
+                    {% if selected_discipline_id %}
+                        <a href="/tests" class="btn btn-outline-danger fw-bold shadow-sm d-flex align-items-center">✖ Сбросить</a>
+                    {% endif %}
+
+                    <button class="btn btn-outline-primary fw-bold shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <img src="{{ url_for('static', path='/img/Redact.svg') }}" style="width: 16px;"> Фильтры
+                    </button>
+
+                    <a href="/tests/create" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center">
+                        + Создать тест
+                    </a>
+                </div>
             </div>
 
             <div class="table-responsive border rounded bg-white">
@@ -104,4 +96,136 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">Параметры поиска</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/tests" method="get" id="mainFilterForm">
+                <div class="modal-body">
+                    <input type="hidden" name="discipline_id" id="f_discipline_id" value="{{ selected_discipline_id or '' }}">
+
+                    <div class="row g-3">
+                        <div class="col-12 picker-row">
+                            <label class="form-label small fw-bold text-secondary">Дисциплина</label>
+                            <div class="input-group">
+                                {% set display_name = '' %}
+                                {% for d in disciplines %}
+                                    {% if d.id|string == selected_discipline_id|string %}
+                                        {% set display_name = d.name %}
+                                    {% endif %}
+                                {% endfor %}
+                                <input type="text" class="form-control bg-light" id="display_discipline" readonly placeholder="Все дисциплины" value="{{ display_name }}">
+                                <button class="btn btn-outline-primary fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#pickDisciplineModal">Выбрать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary fw-bold" onclick="resetPickers()">Очистить</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Применить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% macro render_picker(id, title, items) %}
+<div class="modal fade picker-submodal" id="{{ id }}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-primary">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#filterModal"></button>
+            </div>
+            <div class="p-2 border-bottom bg-light">
+                <input type="text" class="form-control form-control-sm picker-search" placeholder="Поиск...">
+            </div>
+            <div class="list-group list-group-flush" style="max-height: 400px;">
+                {% for item in items %}
+                    <button type="button" class="list-group-item list-group-item-action py-3 search-item"
+                            data-id="{{ item.id }}"
+                            data-name="{{ item.name }}"
+                            data-search="{{ item.name|lower }}">
+                        <div class="fw-bold small">{{ item.name }}</div>
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{{ render_picker('pickDisciplineModal', 'Выбор дисциплины', disciplines) }}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterForm = document.getElementById('mainFilterForm');
+
+    // Отключаем пустые поля перед отправкой, чтобы не ломать FastAPI (int_parsing error)
+    filterForm.addEventListener('submit', function() {
+        const inputs = filterForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (!input.value) {
+                input.disabled = true;
+            }
+        });
+    });
+
+    const pickers = [
+        { modal: 'pickDisciplineModal', hidden: 'f_discipline_id', display: 'display_discipline' }
+    ];
+
+    pickers.forEach(p => {
+        const modalEl = document.getElementById(p.modal);
+        if (!modalEl) return;
+
+        const searchInput = modalEl.querySelector('.picker-search');
+        const items = modalEl.querySelectorAll('.search-item');
+
+        // Живой поиск
+        searchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            items.forEach(item => {
+                const text = item.getAttribute('data-search');
+                item.classList.toggle('d-none', !text.includes(q));
+            });
+        });
+
+        // Клик по элементу списка
+        items.forEach(item => {
+            item.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                document.getElementById(p.hidden).value = id;
+                document.getElementById(p.display).value = name;
+
+                // Закрываем окно подбора и возвращаемся к основному фильтру
+                bootstrap.Modal.getInstance(modalEl).hide();
+                new bootstrap.Modal(document.getElementById('filterModal')).show();
+            });
+        });
+    });
+});
+
+function resetPickers() {
+    const fields = ['discipline_id'];
+    fields.forEach(f => {
+        const hidden = document.getElementById('f_' + f);
+        const display = document.getElementById('display_' + f.split('_')[0]);
+        if (hidden) hidden.value = '';
+        if (display) display.value = '';
+    });
+}
+</script>
+
+<style>
+    .picker-row .form-control { cursor: default; }
+    .picker-submodal .list-group-item { cursor: pointer; border-left: none; border-right: none; }
+    .picker-submodal .list-group-item:hover { background-color: #f8f9fa; }
+</style>
 {% endblock %}
