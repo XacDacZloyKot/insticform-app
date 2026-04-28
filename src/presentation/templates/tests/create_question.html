@@ -35,20 +35,22 @@
                     <div class="form-text small">Поддерживаются картинки, аудио и видеофайлы.</div>
                 </div>
 
-                <div class="row mb-4 p-3 bg-light rounded border">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Тип вопроса</label>
-                        <select class="form-select shadow-sm" id="qType">
-                            <option value="single_choice">Один правильный ответ</option>
-                            <option value="multiple_choice">Несколько правильных ответов</option>
-                        </select>
+                <div class="row mb-4 p-3 bg-light rounded border align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0 border-end">
+                        <label class="form-label fw-bold d-block mb-2 text-secondary small text-uppercase">Режим ответа</label>
+                        <div class="form-check form-switch fs-5 m-0">
+                            <input class="form-check-input shadow-sm" type="checkbox" id="qTypeCheckbox" checked>
+                            <label class="form-check-label fw-bold text-primary" id="qTypeLabel" for="qTypeCheckbox" style="cursor: pointer; user-select: none;">
+                                Несколько правильных ответов
+                            </label>
+                        </div>
                     </div>
-                    <div class="col-md-6 d-flex align-items-center mt-4 mt-md-0">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="qPartial" checked>
-                            <label class="form-check-label fw-bold" for="qPartial">
-                                Разрешить частичные баллы
-                                <i class="bi bi-info-circle text-muted" title="Например: 4 из 5 правильных дадут 0.8 балла"></i>
+                    <div class="col-md-6 ps-md-4">
+                        <label class="form-label fw-bold d-block mb-2 text-secondary small text-uppercase">Оценивание</label>
+                        <div class="form-check form-switch fs-5 m-0">
+                            <input class="form-check-input shadow-sm" type="checkbox" id="qPartial" checked>
+                            <label class="form-check-label fw-bold" for="qPartial" style="cursor: pointer; user-select: none;">
+                                Частичные баллы
                             </label>
                         </div>
                     </div>
@@ -75,58 +77,102 @@
     const optionsContainer = document.getElementById('optionsContainer');
     let optionCount = 0;
 
-    // Функция добавления новой строки варианта ответа
+    // --- ЛОГИКА ДИНАМИЧЕСКОГО ТЕКСТА ЧЕКБОКСА ---
+    const qTypeCheckbox = document.getElementById('qTypeCheckbox');
+    const qTypeLabel = document.getElementById('qTypeLabel');
+
+    qTypeCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            qTypeLabel.textContent = "Несколько правильных ответов";
+            qTypeLabel.classList.replace('text-dark', 'text-primary');
+        } else {
+            qTypeLabel.textContent = "Один правильный ответ";
+            qTypeLabel.classList.replace('text-primary', 'text-dark');
+        }
+    });
+    // --------------------------------------------
+
     function addOption() {
         optionCount++;
+        const optId = `chkOpt_${Date.now()}_${optionCount}`;
+
         const div = document.createElement('div');
         div.className = 'row mb-2 align-items-center option-row';
         div.innerHTML = `
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <input type="text" class="form-control opt-text shadow-sm" placeholder="Текст ответа" required>
             </div>
-            <div class="col-md-2 text-center">
-                <div class="form-check form-switch d-flex justify-content-center">
-                    <input class="form-check-input opt-correct shadow-sm" type="checkbox" title="Правильный ответ?">
+            <div class="col-md-3">
+                <div class="form-check form-switch d-flex align-items-center m-0">
+                    <input class="form-check-input opt-correct shadow-sm fs-5 m-0" type="checkbox" id="${optId}">
+                    <label class="form-check-label fw-bold text-success small ms-2" for="${optId}" style="cursor: pointer; user-select: none;">
+                        Верный ответ
+                    </label>
                 </div>
             </div>
             <div class="col-md-2">
                 <input type="number" class="form-control opt-weight shadow-sm" step="0.1" value="1.0" min="0" title="Вес балла">
             </div>
             <div class="col-md-1 text-end">
-                <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="this.closest('.option-row').remove()">✖</button>
+                <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="this.closest('.option-row').remove()" title="Удалить вариант">✖</button>
             </div>
         `;
         optionsContainer.appendChild(div);
     }
 
-    // Функция полного сброса состояния формы
     function resetFormState() {
-        document.getElementById('questionForm').reset(); // Сброс всех инпутов, включая файл
-        optionsContainer.innerHTML = ''; // Очистка вариантов ответов
+        document.getElementById('questionForm').reset();
+        optionsContainer.innerHTML = '';
         optionCount = 0;
-        // Добавляем 2 пустых варианта по умолчанию
+
+        // Сброс чекбокса в дефолтное состояние (Несколько ответов)
+        qTypeCheckbox.checked = true;
+        qTypeLabel.textContent = "Несколько правильных ответов";
+        if (qTypeLabel.classList.contains('text-dark')) {
+            qTypeLabel.classList.replace('text-dark', 'text-primary');
+        }
+
         addOption();
         addOption();
     }
 
-    // Инициализация при первой загрузке страницы
     resetFormState();
 
-    // Логика кнопки "Очистить" медиафайл
     document.getElementById('clearMediaBtn').addEventListener('click', function() {
         document.getElementById('qMedia').value = '';
     });
 
     document.getElementById('questionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Считываем тип вопроса из состояния чекбокса
+        const qType = qTypeCheckbox.checked ? 'multiple_choice' : 'single_choice';
+        const optionsNodes = Array.from(document.querySelectorAll('.option-row'));
+
+        const correctCount = optionsNodes.filter(row => row.querySelector('.opt-correct').checked).length;
+
+        // ВАЛИДАЦИЯ 1: Если тип "Один ответ", а выбрано несколько
+        if (qType === 'single_choice' && correctCount > 1) {
+            alert('Внимание! Вы выбрали режим "Один правильный ответ", но отметили несколько верных вариантов. Пожалуйста, снимите лишние галочки.');
+            return;
+        }
+
+        // ВАЛИДАЦИЯ 2: Если правильных ответов нет вообще
+        if (correctCount === 0) {
+            const confirmEmpty = confirm('Вы не отметили ни одного правильного ответа. Вы уверены, что хотите сохранить такой вопрос?');
+            if (!confirmEmpty) {
+                return;
+            }
+        }
+
         const submitBtn = document.getElementById('submitBtn');
         const successAlert = document.getElementById('successAlert');
 
         submitBtn.disabled = true;
         submitBtn.innerText = 'Сохранение...';
-        successAlert.classList.add('d-none'); // Скрываем старый алерт, если был
+        successAlert.classList.add('d-none');
 
-        const options = Array.from(document.querySelectorAll('.option-row')).map(row => ({
+        const options = optionsNodes.map(row => ({
             text: row.querySelector('.opt-text').value,
             is_correct: row.querySelector('.opt-correct').checked,
             score_weight: parseFloat(row.querySelector('.opt-weight').value)
@@ -134,7 +180,7 @@
 
         const payload = {
             text: document.getElementById('qText').value,
-            type: document.getElementById('qType').value,
+            type: qType,
             allow_partial_credit: document.getElementById('qPartial').checked,
             options: options
         };
@@ -154,17 +200,10 @@
             });
 
             if (response.ok) {
-                // Вместо перезагрузки страницы обнуляем форму
                 resetFormState();
-
-                // Показываем уведомление и прокручиваем окно вверх
                 successAlert.classList.remove('d-none');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                // Прячем уведомление через 4 секунды
-                setTimeout(() => {
-                    successAlert.classList.add('d-none');
-                }, 4000);
+                setTimeout(() => { successAlert.classList.add('d-none'); }, 4000);
             } else {
                 const errorData = await response.json();
                 alert("Ошибка при сохранении: " + (errorData.detail || errorData.error || "Неизвестная ошибка"));
